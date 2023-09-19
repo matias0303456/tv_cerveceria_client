@@ -25,11 +25,27 @@ footer {
 }
 
 header {
-    height: 110px;
+    height: 80px;
+    display: flex;
+    justify-content: space-between;
+}
+
+header nav {
+    width: 70%;
+    background-color: red;
+    display: flex;
+    align-items: center;
+}
+
+header nav ul {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    list-style: none;
 }
 
 main {
-    height: calc(100vh - 200px);
+    height: calc(100vh - 180px);
 }
 
 footer {
