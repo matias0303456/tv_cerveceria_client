@@ -14,6 +14,7 @@ body {
     background: linear-gradient(#AD692A, #FCE78A);
     height: 100vh;
     color: white;
+    font-family: 'Inknut Antiqua', sans-serif;
 }
 
 header,
@@ -27,25 +28,47 @@ footer {
 header {
     height: 80px;
     display: flex;
-    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+header #logo {
+    width: 40%;
+    padding-left: 30px;
+}
+
+header #logo img {
+    width: 20%;
 }
 
 header nav {
-    width: 70%;
-    background-color: red;
+    width: 50%;
     display: flex;
     align-items: center;
+    padding-right: 20px;
+    padding-left: 20px;
 }
 
 header nav ul {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     width: 100%;
     list-style: none;
 }
 
+header nav ul li {
+    transition: 100ms all;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+header nav ul li:hover {
+    background-color: var(--light);
+    color: var(--dark);
+    cursor: pointer;
+}
+
 main {
-    height: calc(100vh - 180px);
+    height: calc(100vh - 190px);
 }
 
 footer {

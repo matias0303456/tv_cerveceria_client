@@ -1,17 +1,24 @@
+import { useNavigate } from 'react-router-dom'
+
 import Logo from '../../../public/logo.png'
 
 export function Layout({ children }) {
+
+    const navigate = useNavigate()
+
     return (
         <>
             <header>
-                <img src={Logo} alt="Logo cerveza Asgardiana" />
+                <div id='logo'>
+                    <img src={Logo} alt="Logo cerveza Asgardiana" />
+                </div>
                 <nav>
                     <ul>
-                        <li>Inicio</li>
-                        <li>Registros</li>
-                        <li>Recetas</li>
-                        <li>Ingredientes</li>
-                        <li>Alarmas</li>
+                        <li onClick={() => navigate('/')}>Inicio</li>
+                        <li onClick={() => navigate('/records')}>Registros</li>
+                        <li onClick={() => navigate('/recipes')}>Recetas</li>
+                        <li onClick={() => navigate('/ingredients')}>Ingredientes</li>
+                        <li onClick={() => navigate('/alarms')}>Alarmas</li>
                     </ul>
                 </nav>
             </header>
@@ -19,7 +26,7 @@ export function Layout({ children }) {
                 {children}
             </main>
             <footer>
-                Cerveza Asgardiana &copy; {new Date().getFullYear()}
+                Asgardiana &copy; {new Date().getFullYear()}
             </footer>
         </>
     )
