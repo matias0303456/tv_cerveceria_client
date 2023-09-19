@@ -1,8 +1,12 @@
+import { Layout } from "./features/layout/Layout"
+
 function App() {
   return (
-    <div>
-      asdasdasd
-    </div>
+    <>
+      <Layout>
+        
+      </Layout>
+    </>
   )
 }
 

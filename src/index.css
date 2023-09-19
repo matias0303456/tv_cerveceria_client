@@ -1,0 +1,38 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --dark: #AD692A;
+    --light: #FCE78A;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(#AD692A, #FCE78A);
+    height: 100vh;
+    color: white;
+}
+
+header,
+main,
+footer {
+    padding: 10px;
+    margin: 5px;
+    border-radius: 5px;
+}
+
+header {
+    height: 110px;
+}
+
+main {
+    height: calc(100vh - 200px);
+}
+
+footer {
+    height: 10px;
+    text-align: center;
+}
