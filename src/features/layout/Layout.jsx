@@ -14,8 +14,7 @@ export function Layout({ children }) {
                 </div>
                 <nav>
                     <ul>
-                        <li onClick={() => navigate('/')}>Inicio</li>
-                        <li onClick={() => navigate('/records')}>Registros</li>
+                        <li onClick={() => navigate('/')}>Registros</li>
                         <li onClick={() => navigate('/recipes')}>Recetas</li>
                         <li onClick={() => navigate('/ingredients')}>Ingredientes</li>
                         <li onClick={() => navigate('/alarms')}>Alarmas</li>

@@ -1,11 +1,9 @@
-const API_URL = process.env.API_URL
+const API_URL = import.meta.env.VITE_APP_API_URL
 
-export const urls = {
-    units: `${API_URL}/units`,
-    types: `${API_URL}/types`,
-    ingredients: `${API_URL}/ingredients`,
-    recipes: `${API_URL}/recipes`,
-    records: `${API_URL}/records`,
-    alarms: `${API_URL}/alarms`,
-    ingredientsOnRecipes: `${API_URL}/ingredients-on-recipes`
-}
+export const unitsUrl = `${API_URL}/units`
+export const typesUrl = `${API_URL}/types`
+export const ingredientsUrl = `${API_URL}/ingredients`
+export const recipesUrl = `${API_URL}/recipes`
+export const recordsUrl = `${API_URL}/records`
+export const alarmsUrl = `${API_URL}/alarms`
+export const ingredientsOnRecipesUrl = `${API_URL}/ingredients-on-recipes`
