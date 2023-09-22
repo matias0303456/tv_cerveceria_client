@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { Toaster } from "react-hot-toast"
 
 import { IngredientsProvider } from "./features/ingredients/IngredientsProvider"
 import { UnitsProvider } from "./features/units/UnitsProvider"
@@ -9,7 +10,6 @@ import { ErrorPage } from "./features/layout/ErrorPage"
 import { RecordsPage } from "./features/records/RecordsPage"
 import { RecipesPage } from "./features/recipes/RecipesPage"
 import { IngredientsPage } from "./features/ingredients/IngredientsPage"
-import { AlarmsPage } from "./features/alarms/AlarmsPage"
 
 function App() {
   return (
@@ -17,12 +17,12 @@ function App() {
       <UnitsProvider>
         <TypesProvider>
           <BrowserRouter>
+            <Toaster />
             <Layout>
               <Routes>
                 <Route path="/" element={<RecordsPage />} />
                 <Route path="/recipes" element={<RecipesPage />} />
                 <Route path="/ingredients" element={<IngredientsPage />} />
-                <Route path="/alarms" element={<AlarmsPage />} />
                 <Route path="*" element={<ErrorPage />} />
               </Routes>
             </Layout>

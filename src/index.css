@@ -8,13 +8,14 @@
     --light: #FCE78A;
 }
 
-body {
-    display: flex;
-    flex-direction: column;
+#root {
     background: linear-gradient(#AD692A, #FCE78A);
-    height: 100vh;
     color: white;
     font-family: 'Inknut Antiqua', sans-serif;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 header,
@@ -26,9 +27,10 @@ footer {
 }
 
 header {
-    height: 80px;
+    height: 20%;
     display: flex;
     flex-wrap: wrap;
+    justify-content: space-between;
 }
 
 header #logo {
@@ -41,7 +43,7 @@ header #logo img {
 }
 
 header nav {
-    width: 50%;
+    width: 40%;
     display: flex;
     align-items: center;
     padding-right: 20px;
@@ -57,21 +59,85 @@ header nav ul {
 
 header nav ul li {
     transition: 100ms all;
-    padding: 10px;
     border-radius: 5px;
+    padding: 0 10px;
 }
 
-header nav ul li:hover {
+header nav ul li:hover,
+.currentPage {
     background-color: var(--light);
     color: var(--dark);
     cursor: pointer;
 }
 
 main {
-    height: calc(100vh - 190px);
+    height: 75%;
+    overflow: scroll;
+    padding: 20px;
 }
 
 footer {
-    height: 10px;
     text-align: center;
+    height: 5%;
+    font-size: .8rem;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 1px 1px 1px var(--dark);
+}
+
+input,
+select,
+button {
+    padding: 5px;
+    border-radius: 5px;
+}
+
+input[type="submit"],
+button {
+    margin: 0 auto;
+    margin-top: 20px;
+    width: 40%;
+    background-color: var(--dark);
+    color: white;
+    border: none;
+    transition: 100ms all;
+    font-family: 'Inknut Antiqua', sans-serif;
+    padding: 0;
+}
+
+input[type="submit"]:hover,
+button:hover {
+    cursor: pointer;
+    background-color: #b46f2e;
+}
+
+small {
+    font-size: .6rem;
+}
+
+main::-webkit-scrollbar,
+.ingredientCard::-webkit-scrollbar {
+    display: none;
+}
+
+main,
+.ingredientCard {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.actions {
+    color: var(--dark);
+    scale: 1.2;
+    transition: 300ms all;
+}
+
+.actions:hover {
+    cursor: pointer;
+    scale: 1.5;
 }

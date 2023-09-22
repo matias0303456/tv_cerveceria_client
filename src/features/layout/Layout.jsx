@@ -1,10 +1,11 @@
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 import Logo from '../../../public/logo.png'
 
 export function Layout({ children }) {
 
     const navigate = useNavigate()
+    const { pathname } = useLocation()
 
     return (
         <>
@@ -14,10 +15,15 @@ export function Layout({ children }) {
                 </div>
                 <nav>
                     <ul>
-                        <li onClick={() => navigate('/')}>Registros</li>
-                        <li onClick={() => navigate('/recipes')}>Recetas</li>
-                        <li onClick={() => navigate('/ingredients')}>Ingredientes</li>
-                        <li onClick={() => navigate('/alarms')}>Alarmas</li>
+                        <li onClick={() => navigate('/')} className={pathname === '/' ? 'currentPage' : ''}>
+                            Registros
+                        </li>
+                        <li onClick={() => navigate('/recipes')} className={pathname === '/recipes' ? 'currentPage' : ''}>
+                            Recetas
+                        </li>
+                        <li onClick={() => navigate('/ingredients')} className={pathname === '/ingredients' ? 'currentPage' : ''}>
+                            Ingredientes
+                        </li>
                     </ul>
                 </nav>
             </header>
@@ -25,7 +31,7 @@ export function Layout({ children }) {
                 {children}
             </main>
             <footer>
-                Asgardiana &copy; {new Date().getFullYear()}
+                Cerveza Asgardiana &copy; {new Date().getFullYear()}
             </footer>
         </>
     )

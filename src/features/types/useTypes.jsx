@@ -1,5 +1,5 @@
 import { useContext, useEffect } from "react"
-import { TypesContext } from "./UnitsProvider"
+import { TypesContext } from "./TypesProvider"
 
 import { typesUrl } from '../../config/urls'
 
