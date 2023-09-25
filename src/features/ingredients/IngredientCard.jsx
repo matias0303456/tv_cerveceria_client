@@ -16,7 +16,7 @@ export function IngredientCard({ ingredient, current, setCurrent, edit, setEdit 
         <div className="ingredientCard" style={{
             backgroundColor: (current.id !== ingredient.id || !edit) ? 'gold' : '#AD692A',
             color: (current.id !== ingredient.id || !edit) ? 'black' : '#FCE78A',
-            boxShadow: '1px 1px 3px black',
+            boxShadow: '1px 1px 3px #AD692A',
             width: '20%',
             height: 150,
             overflow: 'scroll',

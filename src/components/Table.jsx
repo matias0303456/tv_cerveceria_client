@@ -5,20 +5,19 @@ export function Table({ columns, data }) {
                 <tr>
                     {columns.map((col, idx) => {
                         return (
-                            <th key={idx}>{col}</th>
+                            <th key={idx}>{col.label}</th>
                         )
                     })}
                 </tr>
             </thead>
             <tbody>
                 {data.map(row => {
+                    const accessors = columns.map(col => col.accessor)
                     return (
                         <tr key={row.id}>
-                            {Object.keys(row).map((key, idx) => {
+                            {accessors.map((acc, idx) => {
                                 return (
-                                    <td key={idx}>
-                                        {row[key]}
-                                    </td>
+                                    <td key={idx}>{row[acc]}</td>
                                 )
                             })}
                         </tr>
