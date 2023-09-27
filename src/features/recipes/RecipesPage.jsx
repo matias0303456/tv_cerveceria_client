@@ -9,7 +9,15 @@ export function RecipesPage() {
     const { recipes } = useRecipes()
 
     const [open, setOpen] = useState(false)
-    const [recipe, setRecipe] = useState(null)
+    const [recipe, setRecipe] = useState({
+        name: '',
+        style: '',
+        alcohol_content: '',
+        initial_density: '',
+        final_density: '',
+        ibu: '',
+        time: ''
+    })
 
     const toggleOpen = () => setOpen(!open)
 
@@ -32,6 +40,8 @@ export function RecipesPage() {
             <RecipesModal
                 open={open}
                 toggleOpen={toggleOpen}
+                recipe={recipe}
+                setRecipe={setRecipe}
             />
             <Table
                 columns={columnsRecipes}

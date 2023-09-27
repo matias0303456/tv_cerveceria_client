@@ -6,31 +6,23 @@ import { useIngredients } from '../ingredients/useIngredients'
 import { useUnits } from '../units/useUnits'
 
 import { BOIL_ALARM, MACERATE_ALARM } from "../../config/constants";
+import { errorToast } from "../../utils/toaster";
 
-export function RecipesModal({ open, toggleOpen }) {
+export function RecipesModal({ open, toggleOpen, recipe, setRecipe }) {
 
     const { ingredients } = useIngredients()
     const { units } = useUnits()
 
     const [step, setStep] = useState(1)
-    const [recipe, setRecipe] = useState({
-        name: '',
-        style: '',
-        alcohol_content: '',
-        initial_density: '',
-        final_density: '',
-        ibu: '',
-        time: ''
-    })
     const [newIngredient, setNewIngredient] = useState({
         ingredient_id: '',
-        amount: 0,
+        amount: '',
         unit_id: ''
     })
     const [ingredientsOnRecipe, setIngredientsOnRecipe] = useState([])
     const [newAlarm, setNewAlarm] = useState({
         name: '',
-        duration: 0,
+        duration: '',
         type: ''
     })
     const [alarms, setAlarms] = useState([])
@@ -71,6 +63,96 @@ export function RecipesModal({ open, toggleOpen }) {
         })
     }
 
+    const validateIngredient = () => {
+        let flag = true
+        let message = ''
+        let errors = {
+            'ingredient_id': 'Nombre requerido.',
+            'amount': 'Cantidad requerida.',
+            'unit_id': 'Unidad requerida.'
+        }
+        Object.keys(newIngredient).forEach(key => {
+            if (newIngredient[key].length === 0) {
+                message += `- ${errors[key]}\n`
+                flag = false
+            }
+        })
+        if (!flag) {
+            errorToast(message)
+        }
+        return flag
+    }
+
+    const handleAddIngredient = () => {
+        const isValid = validateIngredient()
+        if (isValid) {
+            setIngredientsOnRecipe([...ingredientsOnRecipe, newIngredient])
+            setNewIngredient({
+                ingredient_id: '',
+                amount: '',
+                unit_id: ''
+            })
+        }
+    }
+
+    const validateAlarm = () => {
+        let flag = true
+        let message = ''
+        let errors = {
+            'name': 'Nombre requerido.',
+            'duration': 'Duración requerida.',
+            'type': 'Tipo requerido.'
+        }
+        Object.keys(newAlarm).forEach(key => {
+            if (newAlarm[key].length === 0) {
+                message += `- ${errors[key]}\n`
+                flag = false
+            }
+        })
+        if (!flag) {
+            errorToast(message)
+        }
+        return flag
+    }
+
+    const handleAddAlarm = () => {
+        const isValid = validateAlarm()
+        if (isValid) {
+            setAlarms([...alarms, newAlarm])
+            setNewAlarm({
+                name: '',
+                duration: '',
+                type: ''
+            })
+        }
+    }
+
+    const validateRecipe = data => {
+        let flag = true
+        let message = ''
+        let errors = {
+            'name': 'Nombre requerido.',
+            'style': 'Estilo requerido.',
+            'alcohol_content': 'Porcentaje de alcohol requerido.',
+            'initial_density': 'Densidad inicial requerida.',
+            'final_density': 'Densidad final requerida.',
+            'ibu': 'IBU requerido.',
+            'time': 'Tiempo requerido.',
+            'ingredients': 'Es necesario al menos un ingrediente.',
+            'alarms': 'Es necesaria al menos una alarma.'
+        }
+        Object.keys(data).forEach(key => {
+            if (data[key].length === 0) {
+                message += `- ${errors[key]}\n`
+                flag = false
+            }
+        })
+        if (!flag) {
+            errorToast(message)
+        }
+        return flag
+    }
+
     const handleSubmit = e => {
         e.preventDefault()
         const data = {
@@ -78,11 +160,32 @@ export function RecipesModal({ open, toggleOpen }) {
             ingredients: ingredientsOnRecipe,
             alarms
         }
-        console.log(data)
+        const isValid = validateRecipe(data)
     }
 
     const reset = () => {
-
+        setStep(1)
+        setRecipe({
+            name: '',
+            style: '',
+            alcohol_content: '',
+            initial_density: '',
+            final_density: '',
+            ibu: '',
+            time: ''
+        })
+        setNewIngredient({
+            ingredient_id: '',
+            amount: 0,
+            unit_id: ''
+        })
+        setIngredientsOnRecipe([])
+        setNewAlarm({
+            name: '',
+            duration: 0,
+            type: ''
+        })
+        setAlarms([])
     }
 
     return (
@@ -125,14 +228,16 @@ export function RecipesModal({ open, toggleOpen }) {
                         <form onChange={handleChangeIngredients}>
                             <label htmlFor="ingredient_id">Nombre</label>
                             <select name="ingredient_id">
+                                <option value="">Seleccione</option>
                                 {ingredients.map(ing => {
                                     return <option key={ing.id} value={ing.id}>{ing.name}</option>
                                 })}
                             </select>
                             <label htmlFor="amount">Cantidad</label>
-                            <input type="number" name="amount" min={0} defaultValue={0} />
+                            <input type="number" name="amount" min={0} />
                             <label htmlFor="amount">Unidad</label>
                             <select name="unit_id">
+                                <option value="">Seleccione</option>
                                 {units.map(u => {
                                     return <option key={u.id} value={u.id}>{u.name}</option>
                                 })}
@@ -140,7 +245,7 @@ export function RecipesModal({ open, toggleOpen }) {
                             <button
                                 type="button"
                                 style={{ width: '20%' }}
-                                onClick={() => setIngredientsOnRecipe([...ingredientsOnRecipe, newIngredient])}
+                                onClick={handleAddIngredient}
                             >
                                 Añadir
                             </button>
@@ -170,16 +275,17 @@ export function RecipesModal({ open, toggleOpen }) {
                             <label htmlFor="name">Nombre</label>
                             <input type="text" name="name" />
                             <label htmlFor="duration">Duración (min.)</label>
-                            <input type="number" name="duration" min={0} defaultValue={0} />
+                            <input type="number" name="duration" min={0} />
                             <label htmlFor="type">Tipo</label>
                             <select name="type">
+                                <option value="">Seleccione</option>
                                 <option value={MACERATE_ALARM}>Macerado</option>
                                 <option value={BOIL_ALARM}>Hervor</option>
                             </select>
                             <button
                                 type="button"
                                 style={{ width: '20%' }}
-                                onClick={() => setAlarms([...alarms, newAlarm])}
+                                onClick={handleAddAlarm}
                             >
                                 Añadir
                             </button>
