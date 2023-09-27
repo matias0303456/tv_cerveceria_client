@@ -1,24 +1,44 @@
+import { useState } from "react";
+
 import { Table } from "../../components/Table";
 import { useRecipes } from "./useRecipes";
+import { RecipesModal } from "./RecipesModal";
 
 export function RecipesPage() {
 
     const { recipes } = useRecipes()
 
-    const columns = [
-        { accessor: 'id', label: '#' },
-        { accessor: 'name', label: 'Nombre' },
-        { accessor: 'alcohol_content', label: '% Alcohol' },
-        { accessor: 'initial_density', label: 'Densidad inicial' },
-        { accessor: 'final_density', label: 'Densidad final' },
-        { accessor: 'ibu', label: 'IBU' },
-        { accessor: 'style', label: 'Estilo' },
-        { accessor: 'time', label: 'Tiempo' }
+    const [open, setOpen] = useState(false)
+    const [recipe, setRecipe] = useState(null)
+
+    const toggleOpen = () => setOpen(!open)
+
+    const columnsRecipes = [
+        { label: '#', accessor: 'id' },
+        { label: 'Nombre', accessor: 'name' },
+        { label: '% Alcohol', accessor: 'alcohol_content' },
+        { label: 'Densidad inicial', accessor: 'initial_density' },
+        { label: 'Densidad final', accessor: 'final_density' },
+        { label: 'IBU', accessor: 'ibu' },
+        { label: 'Estilo', accessor: 'style' },
+        { label: 'Tiempo', accessor: 'time' }
     ]
 
     return (
         <>
-            <Table columns={columns} data={recipes} />
+            <button style={{ width: '10%', marginBottom: 10 }} onClick={toggleOpen}>
+                Nueva
+            </button>
+            <RecipesModal
+                open={open}
+                toggleOpen={toggleOpen}
+            />
+            <Table
+                columns={columnsRecipes}
+                data={recipes}
+                setRecipe={setRecipe}
+                toggleOpen={toggleOpen}
+            />
         </>
     )
 }

@@ -1,4 +1,10 @@
-export function Table({ columns, data }) {
+export function Table({
+    columns,
+    data,
+    toggleOpen = false,
+    setRecipe = false,
+    disableInteractivity = false
+}) {
     return (
         <table>
             <thead>
@@ -11,18 +17,32 @@ export function Table({ columns, data }) {
                 </tr>
             </thead>
             <tbody>
-                {data.map(row => {
-                    const accessors = columns.map(col => col.accessor)
-                    return (
-                        <tr key={row.id}>
-                            {accessors.map((acc, idx) => {
-                                return (
-                                    <td key={idx}>{row[acc]}</td>
-                                )
-                            })}
-                        </tr>
-                    )
-                })}
+                {data.length === 0 ?
+                    <tr>
+                        <td colSpan={columns.length}>No hay registros para mostrar.</td>
+                    </tr> :
+                    data.map((row, idx) => {
+                        const accessors = columns.map(col => col.accessor)
+                        return (
+                            <tr
+                                key={idx}
+                                className={!disableInteractivity ? 'withHover' : ''}
+                                onClick={() => {
+                                    if (setRecipe) setRecipe(row)
+                                    if (toggleOpen) toggleOpen()
+                                }}
+                            >
+                                {accessors.map((acc, idx) => {
+                                    return (
+                                        <td key={idx}>
+                                            {typeof acc === 'function' ? acc(row) : row[acc] ?? '-'}
+                                        </td>
+                                    )
+                                })}
+                            </tr>
+                        )
+                    })
+                }
             </tbody>
         </table>
     )

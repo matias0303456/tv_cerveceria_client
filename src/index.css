@@ -97,6 +97,12 @@ form {
     box-shadow: 1px 1px 1px var(--dark);
 }
 
+#recipesForm {
+    box-shadow: none;
+    width: 50%;
+    margin: 0 auto;
+}
+
 input,
 select,
 button {
@@ -128,12 +134,14 @@ small {
 }
 
 main::-webkit-scrollbar,
-.ingredientCard::-webkit-scrollbar {
+.ingredientCard::-webkit-scrollbar,
+dialog::-webkit-scrollbar {
     display: none;
 }
 
 main,
-.ingredientCard {
+.ingredientCard,
+dialog {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
@@ -159,11 +167,36 @@ table {
     border-collapse: collapse;
 }
 
-tr {
+tbody .withHover {
     transition: 100ms all;
 }
 
-tbody tr:hover {
+tbody .withHover:hover {
     background-color: var(--dark);
     color: white;
+    cursor: pointer;
+}
+
+dialog {
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.5s;
+    width: 95vw;
+    margin: 0 auto;
+    height: 90vh;
+    background-color: var(--light);
+    border: none;
+    border-radius: 5px;
+    box-shadow: 1px 1px 1px var(--dark);
+    position: absolute;
+    top: 10px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    overflow: scroll;
+}
+
+dialog[open] {
+    opacity: 1;
+    pointer-events: inherit;
 }
