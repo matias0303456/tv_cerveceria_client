@@ -25,5 +25,20 @@ export function useRecipes() {
         }
     }
 
-    return { recipes }
+    async function createRecipe(recipe) {
+        try {
+            const res = await fetch(recipesUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(recipe)
+            })
+            const status = res.status
+            const data = await res.json()
+            return { status, data }
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+    return { recipes, createRecipe }
 }

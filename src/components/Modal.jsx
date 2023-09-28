@@ -1,6 +1,6 @@
 export function Modal({
     open,
-    toggleOpen,
+    toggleOpen = false,
     reset = false,
     children
 }) {
@@ -10,7 +10,7 @@ export function Modal({
                 <button
                     onClick={() => {
                         if (reset) reset()
-                        toggleOpen()
+                        if (toggleOpen) toggleOpen()
                     }}
                     style={{
                         width: 60,

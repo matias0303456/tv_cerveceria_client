@@ -1,17 +1,22 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 
 import { Modal } from "../../components/Modal";
 import { Table } from "../../components/Table";
 import { useIngredients } from '../ingredients/useIngredients'
 import { useUnits } from '../units/useUnits'
+import { useRecipes } from "./useRecipes";
+import { RecipesContext } from "./RecipesProvider";
 
 import { BOIL_ALARM, MACERATE_ALARM } from "../../config/constants";
-import { errorToast } from "../../utils/toaster";
+import { errorToast, successToast } from "../../utils/toaster";
 
 export function RecipesModal({ open, toggleOpen, recipe, setRecipe }) {
 
+    const { setRecipes } = useContext(RecipesContext)
+
     const { ingredients } = useIngredients()
     const { units } = useUnits()
+    const { createRecipe } = useRecipes()
 
     const [step, setStep] = useState(1)
     const [newIngredient, setNewIngredient] = useState({
@@ -92,6 +97,9 @@ export function RecipesModal({ open, toggleOpen, recipe, setRecipe }) {
                 amount: '',
                 unit_id: ''
             })
+            document.getElementById('ingName').value = ''
+            document.getElementById('ingAmount').value = ''
+            document.getElementById('ingUnit').value = ''
         }
     }
 
@@ -124,6 +132,9 @@ export function RecipesModal({ open, toggleOpen, recipe, setRecipe }) {
                 duration: '',
                 type: ''
             })
+            document.getElementById('alarmName').value = ''
+            document.getElementById('alarmDuration').value = ''
+            document.getElementById('alarmType').value = ''
         }
     }
 
@@ -153,14 +164,24 @@ export function RecipesModal({ open, toggleOpen, recipe, setRecipe }) {
         return flag
     }
 
-    const handleSubmit = e => {
+    const handleSubmit = async e => {
         e.preventDefault()
-        const data = {
+        const newRecipe = {
             ...recipe,
             ingredients: ingredientsOnRecipe,
             alarms
         }
-        const isValid = validateRecipe(data)
+        const isValid = validateRecipe(newRecipe)
+        if (isValid) {
+            const { status, data } = await createRecipe(newRecipe)
+            if (status === 200) {
+                setRecipes(prev => [data, ...prev.filter(item => item.id !== data.id)])
+                successToast('Receta creada correctamente.')
+                reset()
+            } else {
+                errorToast(data.message)
+            }
+        }
     }
 
     const reset = () => {
@@ -186,10 +207,11 @@ export function RecipesModal({ open, toggleOpen, recipe, setRecipe }) {
             type: ''
         })
         setAlarms([])
+        toggleOpen()
     }
 
     return (
-        <Modal open={open} toggleOpen={toggleOpen} reset={reset}>
+        <Modal open={open} reset={reset}>
             {step === 1 &&
                 <form id="recipesForm" onChange={handleChangeRecipe}>
                     <p style={{ textAlign: 'center' }}>Nueva receta</p>
@@ -227,16 +249,16 @@ export function RecipesModal({ open, toggleOpen, recipe, setRecipe }) {
                     <div style={{ width: '50%', margin: '0 auto', marginTop: 10 }}>
                         <form onChange={handleChangeIngredients}>
                             <label htmlFor="ingredient_id">Nombre</label>
-                            <select name="ingredient_id">
+                            <select id="ingName" name="ingredient_id">
                                 <option value="">Seleccione</option>
                                 {ingredients.map(ing => {
                                     return <option key={ing.id} value={ing.id}>{ing.name}</option>
                                 })}
                             </select>
                             <label htmlFor="amount">Cantidad</label>
-                            <input type="number" name="amount" min={0} />
+                            <input id="ingAmount" type="number" name="amount" min={0} />
                             <label htmlFor="amount">Unidad</label>
-                            <select name="unit_id">
+                            <select id="ingUnit" name="unit_id">
                                 <option value="">Seleccione</option>
                                 {units.map(u => {
                                     return <option key={u.id} value={u.id}>{u.name}</option>
@@ -272,16 +294,32 @@ export function RecipesModal({ open, toggleOpen, recipe, setRecipe }) {
                     </div>
                     <div style={{ width: '50%', margin: '0 auto', marginTop: 20 }}>
                         <form onChange={handleChangeAlarms}>
-                            <label htmlFor="name">Nombre</label>
-                            <input type="text" name="name" />
-                            <label htmlFor="duration">Duración (min.)</label>
-                            <input type="number" name="duration" min={0} />
                             <label htmlFor="type">Tipo</label>
-                            <select name="type">
+                            <select id="alarmType" name="type">
                                 <option value="">Seleccione</option>
                                 <option value={MACERATE_ALARM}>Macerado</option>
                                 <option value={BOIL_ALARM}>Hervor</option>
                             </select>
+                            <label htmlFor="name">Nombre</label>
+                            <select id="alarmName" name="name" disabled={newAlarm.type.length === 0}>
+                                <option value="">Seleccione</option>
+                                {newAlarm.type === MACERATE_ALARM &&
+                                    <>
+                                        <option value="PRIMER_RECIRCULADO">PRIMER RECIRCULADO</option>
+                                        <option value="SEGUNDO_RECIRCULADO">SEGUNDO RECIRCULADO</option>
+                                        <option value="EXTRA">EXTRA</option>
+                                    </>
+                                }
+                                {newAlarm.type === BOIL_ALARM &&
+                                    <>
+                                        <option value="PRIMER_LUPULO">PRIMER LUPULO</option>
+                                        <option value="SEGUNDO_LUPULO">SEGUNDO LUPULO</option>
+                                        <option value="WHIRPOOL">WHIRPOOL</option>
+                                    </>
+                                }
+                            </select>
+                            <label htmlFor="duration">Duración (min.)</label>
+                            <input id="alarmDuration" type="number" name="duration" min={0} />
                             <button
                                 type="button"
                                 style={{ width: '20%' }}
