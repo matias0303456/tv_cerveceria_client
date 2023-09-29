@@ -11,28 +11,31 @@ import { RecordsPage } from "./features/records/RecordsPage"
 import { RecipesPage } from "./features/recipes/RecipesPage"
 import { IngredientsPage } from "./features/ingredients/IngredientsPage"
 import { RecipesProvider } from "./features/recipes/RecipesProvider"
+import { RecordsProvider } from "./features/records/RecordsProvider"
 
 function App() {
   return (
-    <RecipesProvider>
-      <IngredientsProvider>
-        <UnitsProvider>
-          <TypesProvider>
-            <BrowserRouter>
-              <Toaster />
-              <Layout>
-                <Routes>
-                  <Route path="/" element={<RecordsPage />} />
-                  <Route path="/recipes" element={<RecipesPage />} />
-                  <Route path="/ingredients" element={<IngredientsPage />} />
-                  <Route path="*" element={<ErrorPage />} />
-                </Routes>
-              </Layout>
-            </BrowserRouter>
-          </TypesProvider>
-        </UnitsProvider>
-      </IngredientsProvider>
-    </RecipesProvider>
+    <RecordsProvider>
+      <RecipesProvider>
+        <IngredientsProvider>
+          <UnitsProvider>
+            <TypesProvider>
+              <BrowserRouter>
+                <Toaster />
+                <Layout>
+                  <Routes>
+                    <Route path="/" element={<RecordsPage />} />
+                    <Route path="/recipes" element={<RecipesPage />} />
+                    <Route path="/ingredients" element={<IngredientsPage />} />
+                    <Route path="*" element={<ErrorPage />} />
+                  </Routes>
+                </Layout>
+              </BrowserRouter>
+            </TypesProvider>
+          </UnitsProvider>
+        </IngredientsProvider>
+      </RecipesProvider>
+    </RecordsProvider>
   )
 }
 

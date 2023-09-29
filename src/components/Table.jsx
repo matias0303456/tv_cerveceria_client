@@ -2,7 +2,7 @@ export function Table({
     columns,
     data,
     toggleOpen = false,
-    setRecipe = false,
+    setEntity = false,
     disableInteractivity = false
 }) {
     return (
@@ -28,7 +28,7 @@ export function Table({
                                 key={idx}
                                 className={!disableInteractivity ? 'withHover' : ''}
                                 onClick={() => {
-                                    if (setRecipe) setRecipe(row)
+                                    if (setEntity) setEntity(row)
                                     if (toggleOpen) toggleOpen()
                                 }}
                             >
