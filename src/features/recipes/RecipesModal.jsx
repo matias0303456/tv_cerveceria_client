@@ -7,6 +7,7 @@ import { useUnits } from '../units/useUnits'
 import { useRecipes } from "./useRecipes";
 import { RecipesContext } from "./RecipesProvider";
 import { useIngredientsOnRecipes } from "../ingredients-on-recipes/useIngredientsOnRecipes";
+import { useAlarms } from "../alarms/useAlarms";
 
 import { BOIL_ALARM, MACERATE_ALARM } from "../../config/constants";
 import { errorToast, successToast } from "../../utils/toaster";
@@ -17,6 +18,7 @@ export function RecipesModal({ open, toggleOpen, recipe, setRecipe, edit }) {
 
     const { ingredients } = useIngredients()
     const { createIngredientOnRecipe, deleteIngredientOnRecipe } = useIngredientsOnRecipes()
+    const { createAlarm, deleteAlarm } = useAlarms()
     const { units } = useUnits()
     const { createRecipe } = useRecipes()
 
@@ -84,6 +86,10 @@ export function RecipesModal({ open, toggleOpen, recipe, setRecipe, edit }) {
     }
 
     const handleAddIngredient = async () => {
+        if (ingredientsOnRecipe.some(item => (item.ingredient?.id ?? parseInt(item.ingredient_id)) === parseInt(newIngredient.ingredient_id))) {
+            errorToast(`Ya existe un ingrediente ${ingredients.find(ing => ing.id === parseInt(newIngredient.ingredient_id)).name} en esta receta.`)
+            return false
+        }
         const isValid = validateIngredient()
         if (isValid) {
             if (edit) {
@@ -91,6 +97,10 @@ export function RecipesModal({ open, toggleOpen, recipe, setRecipe, edit }) {
                 const { status, data } = await createIngredientOnRecipe(value)
                 if (status === 200) {
                     setIngredientsOnRecipe([...ingredientsOnRecipe, data])
+                    setRecipe({
+                        ...recipe,
+                        ingredients: [...recipe.ingredients, data]
+                    })
                     setRecipes([
                         ...recipes.filter(item => item.id !== recipe.id),
                         {
@@ -117,6 +127,10 @@ export function RecipesModal({ open, toggleOpen, recipe, setRecipe, edit }) {
     }
 
     const validateAlarm = () => {
+        if (alarms.some(item => item.name === newAlarm.name)) {
+            errorToast(`Ya existe una alarma de ${newAlarm.name}`)
+            return false
+        }
         let flag = true
         let message = ''
         let errors = {
@@ -136,15 +150,44 @@ export function RecipesModal({ open, toggleOpen, recipe, setRecipe, edit }) {
         return flag
     }
 
-    const handleAddAlarm = () => {
+    const handleAddAlarm = async () => {
         const isValid = validateAlarm()
         if (isValid) {
-            setAlarms([...alarms, newAlarm])
-            setNewAlarm({
-                name: '',
-                duration: '',
-                type: ''
-            })
+            if (edit) {
+                const { status, data } = await createAlarm({ ...newAlarm, recipe_id: parseInt(recipe.id) })
+                if (status === 200) {
+                    setAlarms([...alarms, newAlarm])
+                    setRecipes([
+                        {
+                            ...recipe,
+                            macerate_alarms: [...recipe.macerate_alarms.filter(item => getAlarmType(newAlarm) === BOIL_ALARM || item.id !== data.id), data],
+                            boil_alarms: [...recipe.boil_alarms.filter(item => getAlarmType(newAlarm) === MACERATE_ALARM || item.id !== data.id), data]
+                        },
+                        ...recipes.filter(item => item.id !== recipe.id)
+                    ])
+                    setRecipe({
+                        ...recipe,
+                        macerate_alarms: [...recipe.macerate_alarms.filter(item => getAlarmType(newAlarm) === BOIL_ALARM | item.id !== data.id), data],
+                        boil_alarms: [...recipe.boil_alarms.filter(item => getAlarmType(newAlarm) === MACERATE_ALARM || item.id !== data.id), data]
+                    })
+                    setNewAlarm({
+                        name: '',
+                        duration: '',
+                        type: ''
+                    })
+                    successToast('Alarma añadida correctamente.')
+                }
+                if (status === 500) {
+                    errorToast(`Ya existe una alarma de ${newAlarm.name.replace('_', ' ')}`)
+                }
+            } else {
+                setAlarms([...alarms, newAlarm])
+                setNewAlarm({
+                    name: '',
+                    duration: '',
+                    type: ''
+                })
+            }
         }
     }
 
@@ -233,6 +276,16 @@ export function RecipesModal({ open, toggleOpen, recipe, setRecipe, edit }) {
                         const { status, data } = await deleteIngredientOnRecipe(recipe.id, row.ingredient.id)
                         if (status === 200) {
                             setIngredientsOnRecipe([...ingredientsOnRecipe.filter(item => item.ingredient.id !== data.ingredient_id)])
+                            setRecipes([
+                                ...recipes.filter(item => item.id !== recipe.id),
+                                {
+                                    ...recipe,
+                                    ingredients: [...recipe.ingredients.filter(ing => ing.id !== data.id)]
+                                }])
+                            setRecipe({
+                                ...recipe,
+                                ingredients: [...recipe.ingredients.filter(ing => ing.id !== data.id)]
+                            })
                             successToast('Ingrediente eliminado correctamente de esta receta.')
                         }
                     } else {
@@ -245,14 +298,47 @@ export function RecipesModal({ open, toggleOpen, recipe, setRecipe, edit }) {
         }
     ]
 
+    const getAlarmType = row => {
+        if (row.name === 'PRIMER_RECIRCULADO' ||
+            row.name === 'SEGUNDO_RECIRCULADO' ||
+            row.name === 'EXTRA') {
+            return MACERATE_ALARM
+        } else {
+            return BOIL_ALARM
+        }
+    }
+
     const columnsAlarms = [
         { label: '#', accessor: 'id' },
         { label: 'Nombre', accessor: 'name' },
         { label: 'Duración', accessor: 'duration' },
         {
             label: '',
-            accessor: data => (
-                <button style={{ width: 20, marginBottom: 20 }}>
+            accessor: row => (
+                <button style={{ width: 20, marginBottom: 20 }} onClick={async () => {
+                    if (edit) {
+                        const { status, data } = await deleteAlarm(getAlarmType(row), row.id)
+                        if (status === 200) {
+                            setAlarms([...alarms.filter(item => item.id !== data.id)])
+                            setRecipes([
+                                {
+                                    ...recipe,
+                                    macerate_alarms: [...recipe.macerate_alarms.filter(item => getAlarmType(row) === BOIL_ALARM || item.id !== row.id)],
+                                    boil_alarms: [...recipe.boil_alarms.filter(item => getAlarmType(row) === MACERATE_ALARM || item.id !== row.id)]
+                                },
+                                ...recipes.filter(item => item.id !== recipe.id)
+                            ])
+                            setRecipe({
+                                ...recipe,
+                                macerate_alarms: [...recipe.macerate_alarms.filter(item => getAlarmType(row) === BOIL_ALARM || item.id !== row.id)],
+                                boil_alarms: [...recipe.boil_alarms.filter(item => getAlarmType(row) === MACERATE_ALARM || item.id !== row.id)]
+                            })
+                            successToast('Alarma eliminada correctamente de esta receta.')
+                        }
+                    } else {
+                        setAlarms([...alarms.filter(item => item.name !== row.name || item.type !== row.type)])
+                    }
+                }}>
                     X
                 </button>
             )
@@ -261,10 +347,10 @@ export function RecipesModal({ open, toggleOpen, recipe, setRecipe, edit }) {
 
     return (
         <Modal open={open} reset={reset}>
+            <p style={{ textAlign: 'center', fontWeight: 'bold' }}>{edit ? `Receta #${recipe.id}` : 'Nueva receta'}</p>
             {step === 1 &&
                 <div style={{ width: '50%', margin: '0 auto', marginTop: 10 }}>
                     <form onChange={handleChangeRecipe}>
-                        <p style={{ textAlign: 'center' }}>{edit ? `Receta #${recipe.id}` : 'Nueva receta'}</p>
                         <label htmlFor="name">Nombre</label>
                         <input type="text" name="name" value={recipe.name} />
 

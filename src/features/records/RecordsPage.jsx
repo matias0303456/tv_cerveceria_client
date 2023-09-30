@@ -82,27 +82,29 @@ export function RecordsPage() {
                 <div style={{ width: '50%', margin: '0 auto', marginTop: 90 }}>
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <p style={{ textAlign: 'center' }}>{edit ? `Editar registro #${current.id}` : 'Nuevo registro'}</p>
-                        <span style={{ display: 'flex', justifyContent: 'end' }}>
-                            <AiFillDelete
-                                className="actions"
-                                style={{ transform: 'scale(1.3)' }}
-                                onClick={() => {
-                                    toast(t => {
-                                        return <DeleteConfirmation
-                                            t={t}
-                                            id={current.id}
-                                            method={deleteRecord}
-                                            setter={() => {
-                                                setRecords(prev => [...prev.filter(item => item.id !== current.id)])
-                                                toggleOpen()
-                                                setEdit(false)
-                                                reset()
-                                            }}
-                                        />
-                                    }, { position: 'bottom-right' })
-                                }}
-                            />
-                        </span>
+                        {edit &&
+                            <span style={{ display: 'flex', justifyContent: 'end' }}>
+                                <AiFillDelete
+                                    className="actions"
+                                    style={{ transform: 'scale(1.3)' }}
+                                    onClick={() => {
+                                        toast(t => {
+                                            return <DeleteConfirmation
+                                                t={t}
+                                                id={current.id}
+                                                method={deleteRecord}
+                                                setter={() => {
+                                                    setRecords(prev => [...prev.filter(item => item.id !== current.id)])
+                                                    toggleOpen()
+                                                    setEdit(false)
+                                                    reset()
+                                                }}
+                                            />
+                                        }, { position: 'bottom-right' })
+                                    }}
+                                />
+                            </span>
+                        }
                         <label htmlFor="recipe_id">Receta</label>
                         <select {...register("recipe_id", { required: true })} >
                             <option value="">Seleccione</option>
