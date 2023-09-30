@@ -1,4 +1,6 @@
 import { useContext, useEffect, useState } from "react";
+import { AiFillDelete } from 'react-icons/ai'
+import { toast } from 'react-hot-toast'
 
 import { Modal } from "../../components/Modal";
 import { Table } from "../../components/Table";
@@ -8,6 +10,7 @@ import { useRecipes } from "./useRecipes";
 import { RecipesContext } from "./RecipesProvider";
 import { useIngredientsOnRecipes } from "../ingredients-on-recipes/useIngredientsOnRecipes";
 import { useAlarms } from "../alarms/useAlarms";
+import { DeleteConfirmation } from '../../components/DeleteConfirmation'
 
 import { BOIL_ALARM, MACERATE_ALARM } from "../../config/constants";
 import { errorToast, successToast } from "../../utils/toaster";
@@ -20,7 +23,7 @@ export function RecipesModal({ open, toggleOpen, recipe, setRecipe, edit }) {
     const { createIngredientOnRecipe, deleteIngredientOnRecipe } = useIngredientsOnRecipes()
     const { createAlarm, deleteAlarm } = useAlarms()
     const { units } = useUnits()
-    const { createRecipe } = useRecipes()
+    const { createRecipe, editRecipe, deleteRecipe } = useRecipes()
 
     const [step, setStep] = useState(1)
     const [newIngredient, setNewIngredient] = useState({
@@ -37,10 +40,10 @@ export function RecipesModal({ open, toggleOpen, recipe, setRecipe, edit }) {
     const [alarms, setAlarms] = useState([])
 
     useEffect(() => {
-        setIngredientsOnRecipe(recipe.ingredients ?? [])
+        setIngredientsOnRecipe(recipe.ingredients)
         setAlarms([
-            ...recipe.macerate_alarms ?? [],
-            ...recipe.boil_alarms ?? []
+            ...recipe.macerate_alarms,
+            ...recipe.boil_alarms
         ])
     }, [recipe])
 
@@ -96,11 +99,6 @@ export function RecipesModal({ open, toggleOpen, recipe, setRecipe, edit }) {
                 const value = { ...newIngredient, recipe_id: parseInt(recipe.id) }
                 const { status, data } = await createIngredientOnRecipe(value)
                 if (status === 200) {
-                    setIngredientsOnRecipe([...ingredientsOnRecipe, data])
-                    setRecipe({
-                        ...recipe,
-                        ingredients: [...recipe.ingredients, data]
-                    })
                     setRecipes([
                         ...recipes.filter(item => item.id !== recipe.id),
                         {
@@ -108,12 +106,15 @@ export function RecipesModal({ open, toggleOpen, recipe, setRecipe, edit }) {
                             ingredients: [...recipe.ingredients, data]
                         }
                     ])
+                    setIngredientsOnRecipe([...ingredientsOnRecipe, data])
                     setNewIngredient({
                         ingredient_id: '',
                         amount: '',
                         unit_id: ''
                     })
                     successToast('Ingrediente añadido correctamente a esta receta.')
+                } else {
+                    errorToast(data.message)
                 }
             } else {
                 setIngredientsOnRecipe([...ingredientsOnRecipe, newIngredient])
@@ -156,7 +157,6 @@ export function RecipesModal({ open, toggleOpen, recipe, setRecipe, edit }) {
             if (edit) {
                 const { status, data } = await createAlarm({ ...newAlarm, recipe_id: parseInt(recipe.id) })
                 if (status === 200) {
-                    setAlarms([...alarms, newAlarm])
                     setRecipes([
                         {
                             ...recipe,
@@ -165,17 +165,15 @@ export function RecipesModal({ open, toggleOpen, recipe, setRecipe, edit }) {
                         },
                         ...recipes.filter(item => item.id !== recipe.id)
                     ])
-                    setRecipe({
-                        ...recipe,
-                        macerate_alarms: [...recipe.macerate_alarms.filter(item => getAlarmType(newAlarm) === BOIL_ALARM | item.id !== data.id), data],
-                        boil_alarms: [...recipe.boil_alarms.filter(item => getAlarmType(newAlarm) === MACERATE_ALARM || item.id !== data.id), data]
-                    })
+                    setAlarms([...alarms, data])
                     setNewAlarm({
                         name: '',
                         duration: '',
                         type: ''
                     })
                     successToast('Alarma añadida correctamente.')
+                } else {
+                    errorToast(data.message)
                 }
                 if (status === 500) {
                     errorToast(`Ya existe una alarma de ${newAlarm.name.replace('_', ' ')}`)
@@ -203,14 +201,17 @@ export function RecipesModal({ open, toggleOpen, recipe, setRecipe, edit }) {
             'ibu': 'IBU requerido.',
             'time': 'Tiempo requerido.',
             'ingredients': 'Es necesario al menos un ingrediente.',
-            'alarms': 'Es necesaria al menos una alarma.'
+            'macerate_alarms': 'Es necesaria al menos una alarma de macerado.',
+            'boil_alarms': 'Es necesaria al menos una alarma de hervor.'
         }
-        Object.keys(data).forEach(key => {
-            if (data[key].length === 0) {
-                message += `- ${errors[key]}\n`
-                flag = false
-            }
-        })
+        Object.keys(data)
+            .filter(key => !['id', 'created_at', 'updated_at'].includes(key))
+            .forEach(key => {
+                if (data[key].length === 0) {
+                    message += `- ${errors[key]}\n`
+                    flag = false
+                }
+            })
         if (!flag) {
             errorToast(message)
         }
@@ -222,17 +223,35 @@ export function RecipesModal({ open, toggleOpen, recipe, setRecipe, edit }) {
         const newRecipe = {
             ...recipe,
             ingredients: ingredientsOnRecipe,
-            alarms
+            macerate_alarms: alarms.filter(a => a.type === MACERATE_ALARM ||
+                a.name === 'PRIMER_RECIRCULADO' ||
+                a.name === 'SEGUNDO_RECIRCULADO' ||
+                a.name === 'EXTRA'),
+            boil_alarms: alarms.filter(a => a.type === BOIL_ALARM ||
+                a.name === 'PRIMER_LUPULO' ||
+                a.name === 'SEGUNDO_LUPULO' ||
+                a.name === 'WHIRPOOL')
         }
         const isValid = validateRecipe(newRecipe)
         if (isValid) {
-            const { status, data } = await createRecipe(newRecipe)
-            if (status === 200) {
-                setRecipes(prev => [data, ...prev.filter(item => item.id !== data.id)])
-                successToast('Receta creada correctamente.')
-                reset()
+            if (edit) {
+                const { status, data } = await editRecipe(newRecipe)
+                if (status === 200) {
+                    setRecipes(prev => [data, ...prev.filter(item => item.id !== data.id)])
+                    successToast('Receta editada correctamente.')
+                    reset()
+                } else {
+                    errorToast(data.message)
+                }
             } else {
-                errorToast(data.message)
+                const { status, data } = await createRecipe(newRecipe)
+                if (status === 200) {
+                    setRecipes(prev => [data, ...prev.filter(item => item.id !== data.id)])
+                    successToast('Receta creada correctamente.')
+                    reset()
+                } else {
+                    errorToast(data.message)
+                }
             }
         }
     }
@@ -246,17 +265,20 @@ export function RecipesModal({ open, toggleOpen, recipe, setRecipe, edit }) {
             initial_density: '',
             final_density: '',
             ibu: '',
-            time: ''
+            time: '',
+            macerate_alarms: [],
+            boil_alarms: [],
+            ingredients: []
         })
         setNewIngredient({
             ingredient_id: '',
-            amount: 0,
+            amount: '',
             unit_id: ''
         })
         setIngredientsOnRecipe([])
         setNewAlarm({
             name: '',
-            duration: 0,
+            duration: '',
             type: ''
         })
         setAlarms([])
@@ -280,13 +302,15 @@ export function RecipesModal({ open, toggleOpen, recipe, setRecipe, edit }) {
                                 ...recipes.filter(item => item.id !== recipe.id),
                                 {
                                     ...recipe,
-                                    ingredients: [...recipe.ingredients.filter(ing => ing.id !== data.id)]
+                                    ingredients: [...recipe.ingredients.filter(ing => ing.ingredient.id !== data.ingredient_id)]
                                 }])
                             setRecipe({
                                 ...recipe,
-                                ingredients: [...recipe.ingredients.filter(ing => ing.id !== data.id)]
+                                ingredients: [...recipe.ingredients.filter(ing => ing.ingredient.id !== data.ingredient_id)]
                             })
                             successToast('Ingrediente eliminado correctamente de esta receta.')
+                        } else {
+                            errorToast(data.message)
                         }
                     } else {
                         setIngredientsOnRecipe([...ingredientsOnRecipe.filter(item => parseInt(item.ingredient_id) !== parseInt(row.ingredient_id))])
@@ -334,6 +358,8 @@ export function RecipesModal({ open, toggleOpen, recipe, setRecipe, edit }) {
                                 boil_alarms: [...recipe.boil_alarms.filter(item => getAlarmType(row) === MACERATE_ALARM || item.id !== row.id)]
                             })
                             successToast('Alarma eliminada correctamente de esta receta.')
+                        } else {
+                            errorToast(data.message)
                         }
                     } else {
                         setAlarms([...alarms.filter(item => item.name !== row.name || item.type !== row.type)])
@@ -348,6 +374,27 @@ export function RecipesModal({ open, toggleOpen, recipe, setRecipe, edit }) {
     return (
         <Modal open={open} reset={reset}>
             <p style={{ textAlign: 'center', fontWeight: 'bold' }}>{edit ? `Receta #${recipe.id}` : 'Nueva receta'}</p>
+            {edit &&
+                <span style={{ display: 'flex', justifyContent: 'end', width: '50%', margin: '0 auto' }}>
+                    <AiFillDelete
+                        className="actions"
+                        style={{ transform: 'scale(1.3)' }}
+                        onClick={() => {
+                            toast(t => {
+                                return <DeleteConfirmation
+                                    t={t}
+                                    id={recipe.id}
+                                    method={deleteRecipe}
+                                    setter={() => {
+                                        setRecipes(prev => [...prev.filter(item => item.id !== recipe.id)])
+                                        toggleOpen()
+                                    }}
+                                />
+                            }, { position: 'bottom-right' })
+                        }}
+                    />
+                </span>
+            }
             {step === 1 &&
                 <div style={{ width: '50%', margin: '0 auto', marginTop: 10 }}>
                     <form onChange={handleChangeRecipe}>

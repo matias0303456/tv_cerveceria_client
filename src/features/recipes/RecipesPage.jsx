@@ -17,7 +17,10 @@ export function RecipesPage() {
         initial_density: '',
         final_density: '',
         ibu: '',
-        time: ''
+        time: '',
+        macerate_alarms: [],
+        boil_alarms: [],
+        ingredients: []
     })
 
     const toggleOpen = () => setOpen(!open)
@@ -51,7 +54,7 @@ export function RecipesPage() {
             <Table
                 columns={columnsRecipes}
                 data={recipes}
-                setEntity={setRecipe}
+                setEntity={row => setRecipe(recipes.find(item => item.id === row.id))}
                 toggleOpen={() => {
                     setEdit(true)
                     toggleOpen()

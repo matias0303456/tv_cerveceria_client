@@ -3,6 +3,7 @@ import { useContext, useEffect } from "react";
 import { RecipesContext } from "./RecipesProvider";
 
 import { recipesUrl } from "../../config/urls";
+import { BOIL_ALARM, MACERATE_ALARM } from "../../config/constants";
 
 export function useRecipes() {
 
@@ -30,7 +31,10 @@ export function useRecipes() {
             const res = await fetch(recipesUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(recipe)
+                body: JSON.stringify({
+                    ...recipe,
+                    alarms: [...recipe.macerate_alarms, ...recipe.boil_alarms]
+                })
             })
             const status = res.status
             const data = await res.json()
@@ -40,5 +44,47 @@ export function useRecipes() {
         }
     }
 
-    return { recipes, createRecipe }
+    async function editRecipe(recipe) {
+        const setIngredients = () => {
+            return recipe.ingredients.map(ing => {
+                return {
+                    ...ing,
+                    ingredient_id: ing.ingredient.id,
+                    unit_id: ing.unit.id
+                }
+            })
+        }
+        try {
+            const res = await fetch(recipesUrl + `/${recipe.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ...recipe,
+                    alarms: [...recipe.macerate_alarms, ...recipe.boil_alarms],
+                    ingredients: setIngredients()
+                })
+            })
+            const status = res.status
+            const data = await res.json()
+            return { status, data }
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+    async function deleteRecipe(id) {
+        try {
+            const res = await fetch(recipesUrl + `/${id}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            const status = res.status
+            const data = await res.json()
+            return { status, data }
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+    return { recipes, createRecipe, editRecipe, deleteRecipe }
 }
