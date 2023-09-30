@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import { Modal } from "../../components/Modal";
 import { Table } from "../../components/Table";
@@ -6,15 +6,17 @@ import { useIngredients } from '../ingredients/useIngredients'
 import { useUnits } from '../units/useUnits'
 import { useRecipes } from "./useRecipes";
 import { RecipesContext } from "./RecipesProvider";
+import { useIngredientsOnRecipes } from "../ingredients-on-recipes/useIngredientsOnRecipes";
 
 import { BOIL_ALARM, MACERATE_ALARM } from "../../config/constants";
 import { errorToast, successToast } from "../../utils/toaster";
 
-export function RecipesModal({ open, toggleOpen, recipe, setRecipe }) {
+export function RecipesModal({ open, toggleOpen, recipe, setRecipe, edit }) {
 
-    const { setRecipes } = useContext(RecipesContext)
+    const { recipes, setRecipes } = useContext(RecipesContext)
 
     const { ingredients } = useIngredients()
+    const { createIngredientOnRecipe, deleteIngredientOnRecipe } = useIngredientsOnRecipes()
     const { units } = useUnits()
     const { createRecipe } = useRecipes()
 
@@ -32,20 +34,13 @@ export function RecipesModal({ open, toggleOpen, recipe, setRecipe }) {
     })
     const [alarms, setAlarms] = useState([])
 
-    const columnsIngredients = [
-        { label: '#', accessor: 'id' },
-        { label: 'Nombre', accessor: data => ingredients.find(ing => ing.id === parseInt(data.ingredient_id)).name },
-        { label: 'Cantidad', accessor: 'amount' },
-        { label: 'Unidad', accessor: data => units.find(u => u.id === parseInt(data.unit_id)).name },
-        { label: '', accessor: data => '' }
-    ]
-
-    const columnsAlarms = [
-        { label: '#', accessor: 'id' },
-        { label: 'Nombre', accessor: 'name' },
-        { label: 'Duración', accessor: 'duration' },
-        { label: '', accessor: data => '' }
-    ]
+    useEffect(() => {
+        setIngredientsOnRecipe(recipe.ingredients ?? [])
+        setAlarms([
+            ...recipe.macerate_alarms ?? [],
+            ...recipe.boil_alarms ?? []
+        ])
+    }, [recipe])
 
     const handleChangeRecipe = e => {
         setRecipe({
@@ -88,15 +83,36 @@ export function RecipesModal({ open, toggleOpen, recipe, setRecipe }) {
         return flag
     }
 
-    const handleAddIngredient = () => {
+    const handleAddIngredient = async () => {
         const isValid = validateIngredient()
         if (isValid) {
-            setIngredientsOnRecipe([...ingredientsOnRecipe, newIngredient])
-            setNewIngredient({
-                ingredient_id: '',
-                amount: '',
-                unit_id: ''
-            })
+            if (edit) {
+                const value = { ...newIngredient, recipe_id: parseInt(recipe.id) }
+                const { status, data } = await createIngredientOnRecipe(value)
+                if (status === 200) {
+                    setIngredientsOnRecipe([...ingredientsOnRecipe, data])
+                    setRecipes([
+                        ...recipes.filter(item => item.id !== recipe.id),
+                        {
+                            ...recipe,
+                            ingredients: [...recipe.ingredients, data]
+                        }
+                    ])
+                    setNewIngredient({
+                        ingredient_id: '',
+                        amount: '',
+                        unit_id: ''
+                    })
+                    successToast('Ingrediente añadido correctamente a esta receta.')
+                }
+            } else {
+                setIngredientsOnRecipe([...ingredientsOnRecipe, newIngredient])
+                setNewIngredient({
+                    ingredient_id: '',
+                    amount: '',
+                    unit_id: ''
+                })
+            }
         }
     }
 
@@ -204,12 +220,51 @@ export function RecipesModal({ open, toggleOpen, recipe, setRecipe }) {
         toggleOpen()
     }
 
+    const columnsIngredients = [
+        { label: '#', accessor: data => data.ingredient?.id ?? data.id ?? '-' },
+        { label: 'Nombre', accessor: data => data.ingredient?.name ?? ingredients.find(ing => ing.id === parseInt(data.ingredient_id)).name },
+        { label: 'Cantidad', accessor: 'amount' },
+        { label: 'Unidad', accessor: data => data.unit?.name ?? units.find(u => u.id === parseInt(data.unit_id)).name },
+        {
+            label: '',
+            accessor: row => (
+                <button style={{ width: 20, marginBottom: 20 }} onClick={async () => {
+                    if (edit) {
+                        const { status, data } = await deleteIngredientOnRecipe(recipe.id, row.ingredient.id)
+                        if (status === 200) {
+                            setIngredientsOnRecipe([...ingredientsOnRecipe.filter(item => item.ingredient.id !== data.ingredient_id)])
+                            successToast('Ingrediente eliminado correctamente de esta receta.')
+                        }
+                    } else {
+                        setIngredientsOnRecipe([...ingredientsOnRecipe.filter(item => parseInt(item.ingredient_id) !== parseInt(row.ingredient_id))])
+                    }
+                }}>
+                    X
+                </button>
+            )
+        }
+    ]
+
+    const columnsAlarms = [
+        { label: '#', accessor: 'id' },
+        { label: 'Nombre', accessor: 'name' },
+        { label: 'Duración', accessor: 'duration' },
+        {
+            label: '',
+            accessor: data => (
+                <button style={{ width: 20, marginBottom: 20 }}>
+                    X
+                </button>
+            )
+        }
+    ]
+
     return (
         <Modal open={open} reset={reset}>
             {step === 1 &&
                 <div style={{ width: '50%', margin: '0 auto', marginTop: 10 }}>
                     <form onChange={handleChangeRecipe}>
-                        <p style={{ textAlign: 'center' }}>Nueva receta</p>
+                        <p style={{ textAlign: 'center' }}>{edit ? `Receta #${recipe.id}` : 'Nueva receta'}</p>
                         <label htmlFor="name">Nombre</label>
                         <input type="text" name="name" value={recipe.name} />
 
@@ -279,7 +334,10 @@ export function RecipesModal({ open, toggleOpen, recipe, setRecipe }) {
                     <div style={{ width: '50%', margin: '0 auto' }}>
                         <Table
                             columns={columnsAlarms}
-                            data={alarms.filter(a => a.type === MACERATE_ALARM)}
+                            data={alarms.filter(a => a.type === MACERATE_ALARM ||
+                                a.name === 'PRIMER_RECIRCULADO' ||
+                                a.name === 'SEGUNDO_RECIRCULADO' ||
+                                a.name === 'EXTRA')}
                             disableInteractivity
                         />
                     </div>
@@ -287,7 +345,10 @@ export function RecipesModal({ open, toggleOpen, recipe, setRecipe }) {
                     <div style={{ width: '50%', margin: '0 auto' }}>
                         <Table
                             columns={columnsAlarms}
-                            data={alarms.filter(a => a.type === BOIL_ALARM)}
+                            data={alarms.filter(a => a.type === BOIL_ALARM ||
+                                a.name === 'PRIMER_LUPULO' ||
+                                a.name === 'SEGUNDO_LUPULO' ||
+                                a.name === 'WHIRPOOL')}
                             disableInteractivity
                         />
                     </div>

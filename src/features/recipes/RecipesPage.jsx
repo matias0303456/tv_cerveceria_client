@@ -9,6 +9,7 @@ export function RecipesPage() {
     const { recipes } = useRecipes()
 
     const [open, setOpen] = useState(false)
+    const [edit, setEdit] = useState(false)
     const [recipe, setRecipe] = useState({
         name: '',
         style: '',
@@ -39,15 +40,22 @@ export function RecipesPage() {
             </button>
             <RecipesModal
                 open={open}
-                toggleOpen={toggleOpen}
+                toggleOpen={() => {
+                    setEdit(false)
+                    toggleOpen()
+                }}
                 recipe={recipe}
                 setRecipe={setRecipe}
+                edit={edit}
             />
             <Table
                 columns={columnsRecipes}
                 data={recipes}
-                setRecipe={setRecipe}
-                toggleOpen={toggleOpen}
+                setEntity={setRecipe}
+                toggleOpen={() => {
+                    setEdit(true)
+                    toggleOpen()
+                }}
             />
         </>
     )
