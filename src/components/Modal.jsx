@@ -1,3 +1,5 @@
+import { AiFillCloseCircle } from 'react-icons/ai'
+
 export function Modal({
     open,
     toggleOpen = false,
@@ -7,18 +9,18 @@ export function Modal({
     return (
         <dialog open={open} onCancel={e => e.preventDefault()}>
             <div style={{ position: 'relative' }}>
-                <button
+                <span
+                    style={{ display: 'flex', justifyContent: 'end' }}
                     onClick={() => {
                         if (reset) reset()
                         if (toggleOpen) toggleOpen()
                     }}
-                    style={{
-                        width: 60,
-                        position: 'absolute',
-                        right: 0
-                    }}>
-                    Cerrar
-                </button>
+                >
+                    <AiFillCloseCircle
+                        className="actions"
+                        style={{ transform: 'scale(1.3)' }}
+                    />
+                </span>
             </div>
             {children}
         </dialog>

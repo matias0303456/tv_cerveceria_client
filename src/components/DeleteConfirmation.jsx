@@ -1,4 +1,5 @@
 import toast from "react-hot-toast";
+
 import { errorToast, successToast } from "../utils/toaster";
 
 export function DeleteConfirmation({ t, id, method, setter }) {
