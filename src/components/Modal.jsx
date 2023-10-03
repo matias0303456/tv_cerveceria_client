@@ -12,8 +12,8 @@ export function Modal({
                 <span
                     style={{ display: 'flex', justifyContent: 'end' }}
                     onClick={() => {
-                        if (reset) reset()
                         if (toggleOpen) toggleOpen()
+                        if (reset) reset()
                     }}
                 >
                     <AiFillCloseCircle

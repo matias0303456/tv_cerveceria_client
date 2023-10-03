@@ -81,9 +81,9 @@ export function RecordsPage() {
             }}>
                 <div style={{ width: '50%', margin: '0 auto', marginTop: 90 }}>
                     <form onSubmit={handleSubmit(onSubmit)}>
-                        <p style={{ textAlign: 'center' }}>{edit ? `Editar registro #${current.id}` : 'Nuevo registro'}</p>
-                        {edit &&
-                            <span style={{ display: 'flex', justifyContent: 'end' }}>
+                        <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 10 }}>
+                            <p style={{ textAlign: 'center' }}>{edit ? `Registro #${current.id}` : 'Nuevo registro'}</p>
+                            {edit &&
                                 <AiFillDelete
                                     className="actions"
                                     style={{ transform: 'scale(1.3)' }}
@@ -103,8 +103,8 @@ export function RecordsPage() {
                                         }, { position: 'bottom-right' })
                                     }}
                                 />
-                            </span>
-                        }
+                            }
+                        </span>
                         <label htmlFor="recipe_id">Receta</label>
                         <select {...register("recipe_id", { required: true })} >
                             <option value="">Seleccione</option>
