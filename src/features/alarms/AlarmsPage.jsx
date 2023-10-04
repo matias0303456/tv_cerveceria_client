@@ -1,15 +1,20 @@
 import { useContext, useState, useRef, useEffect } from 'react'
 import { AiFillPlayCircle } from 'react-icons/ai'
+import useSound from 'use-sound';
 
 import { RecipesContext } from '../recipes/RecipesProvider'
 import { useRecipes } from "../recipes/useRecipes"
 import { useAlarms } from './useAlarms'
 
 import { BOIL_ALARM, MACERATE_ALARM } from '../../config/constants'
+import alarmSound from '../../assets/alarm-sound.ogg';
+import { successToast } from '../../utils/toaster';
 
 export function AlarmsPage() {
 
     const { setRecipes } = useContext(RecipesContext)
+
+    const [play] = useSound(alarmSound)
 
     const { recipes } = useRecipes()
     const { initiateAlarm } = useAlarms()
@@ -48,8 +53,19 @@ export function AlarmsPage() {
         const decreaseNum = () => setDiff(prev => prev - 1000)
 
         useEffect(() => {
-            intervalRef.current = setInterval(decreaseNum, 1000)
+            const value = `${Math.floor(diff / 1000 / 60)}:${((Math.floor(diff / 1000)) % 60) < 10 ? `0${(Math.floor(diff / 1000)) % 60}` : (Math.floor(diff / 1000)) % 60}`
+            if (value === '0:00') {
+                play()
+                successToast(`
+                    ¡Proceso terminado!
+                    Receta #${alarm.recipe_id}
+                    ${alarm.name}
+                `)
+            }
+        }, [diff])
 
+        useEffect(() => {
+            intervalRef.current = setInterval(decreaseNum, 1000)
             return () => clearInterval(intervalRef.current)
         }, [])
 
