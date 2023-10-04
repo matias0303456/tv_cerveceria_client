@@ -3,13 +3,8 @@ import { AiFillDelete } from 'react-icons/ai'
 import { toast } from 'react-hot-toast'
 
 import { Modal } from "../../components/Modal";
-import { Table } from "../../components/Table";
-import { useIngredients } from '../ingredients/useIngredients'
-import { useUnits } from '../units/useUnits'
 import { useRecipes } from "./useRecipes";
 import { RecipesContext } from "./RecipesProvider";
-import { useIngredientsOnRecipes } from "../ingredients-on-recipes/useIngredientsOnRecipes";
-import { useAlarms } from "../alarms/useAlarms";
 import { DeleteConfirmation } from '../../components/DeleteConfirmation'
 
 import { BOIL_ALARM, MACERATE_ALARM } from "../../config/constants";
@@ -20,11 +15,8 @@ import { FormStep3 } from "./FormStep3";
 
 export function RecipesModal({ open, toggleOpen, recipe, setRecipe, edit }) {
 
-    const { recipes, setRecipes } = useContext(RecipesContext)
+    const { setRecipes } = useContext(RecipesContext)
 
-    const { ingredients } = useIngredients()
-
-    const { units } = useUnits()
     const { createRecipe, editRecipe, deleteRecipe } = useRecipes()
 
     const [step, setStep] = useState(1)
@@ -193,6 +185,7 @@ export function RecipesModal({ open, toggleOpen, recipe, setRecipe, edit }) {
                     setIngredientsOnRecipe={setIngredientsOnRecipe}
                     recipe={recipe}
                     setRecipe={setRecipe}
+                    edit={edit}
                 />
             }
             {step === 3 &&
@@ -203,6 +196,7 @@ export function RecipesModal({ open, toggleOpen, recipe, setRecipe, edit }) {
                     setNewAlarm={setNewAlarm}
                     recipe={recipe}
                     setRecipe={setRecipe}
+                    edit={edit}
                 />
             }
             <div style={{ width: '20%', margin: '0 auto', display: 'flex', justifyContent: 'center' }}>

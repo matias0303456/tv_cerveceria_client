@@ -12,6 +12,7 @@ import { RecipesPage } from "./features/recipes/RecipesPage"
 import { IngredientsPage } from "./features/ingredients/IngredientsPage"
 import { RecipesProvider } from "./features/recipes/RecipesProvider"
 import { RecordsProvider } from "./features/records/RecordsProvider"
+import { AlarmsPage } from "./features/alarms/AlarmsPage"
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
                   <Routes>
                     <Route path="/" element={<RecordsPage />} />
                     <Route path="/recipes" element={<RecipesPage />} />
+                    <Route path="/alarms" element={<AlarmsPage />} />
                     <Route path="/ingredients" element={<IngredientsPage />} />
                     <Route path="*" element={<ErrorPage />} />
                   </Routes>

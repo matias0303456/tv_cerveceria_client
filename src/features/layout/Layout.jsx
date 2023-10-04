@@ -21,6 +21,9 @@ export function Layout({ children }) {
                         <li onClick={() => navigate('/recipes')} className={pathname === '/recipes' ? 'currentPage' : ''}>
                             Recetas
                         </li>
+                        <li onClick={() => navigate('/alarms')} className={pathname === '/alarms' ? 'currentPage' : ''}>
+                            Alarmas
+                        </li>
                         <li onClick={() => navigate('/ingredients')} className={pathname === '/ingredients' ? 'currentPage' : ''}>
                             Ingredientes
                         </li>

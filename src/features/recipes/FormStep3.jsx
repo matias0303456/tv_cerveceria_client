@@ -13,7 +13,8 @@ export function FormStep3({
     newAlarm,
     setNewAlarm,
     recipe,
-    setRecipe
+    setRecipe,
+    edit
 }) {
 
     const { recipes, setRecipes } = useContext(RecipesContext)

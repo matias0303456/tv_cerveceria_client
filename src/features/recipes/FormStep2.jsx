@@ -14,7 +14,8 @@ export function FormStep2({
     ingredientsOnRecipe,
     setIngredientsOnRecipe,
     recipe,
-    setRecipe
+    setRecipe,
+    edit
 }) {
 
     const { recipes, setRecipes } = useContext(RecipesContext)
