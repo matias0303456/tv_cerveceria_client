@@ -17,8 +17,8 @@ export function IngredientsPage() {
     const [edit, setEdit] = useState(false)
 
     return (
-        <div style={{ display: 'flex', justifyContent: 'space-around' }}>
-            <div style={{ width: '20%' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap' }}>
+            <div id="newIngForm">
                 <Form
                     current={current}
                     setCurrent={setCurrent}

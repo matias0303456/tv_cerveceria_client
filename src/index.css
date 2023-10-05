@@ -149,6 +149,10 @@ dialog {
     scrollbar-width: none;
 }
 
+.ingredientCard {
+    width: 20%;
+}
+
 .actions {
     color: var(--dark);
     scale: 1.2;
@@ -202,4 +206,49 @@ dialog {
 dialog[open] {
     opacity: 1;
     pointer-events: inherit;
+}
+
+#newIngForm {
+    width: 20%;
+}
+
+@media (max-width: 966px) {
+    body {
+        font-size: .7rem;
+    }
+
+    .ingredientCard {
+        width: 30%;
+        height: 150px,
+    }
+}
+
+@media (max-width: 750px) {
+    button {
+        font-size: .5rem;
+    }
+    header {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    header #logo {
+        justify-content: center;
+        margin-bottom: 20px;
+        padding-left: 0;
+    }
+
+    header #logo img {
+        width: 25%;
+    }
+}
+
+@media (max-width: 650px) {
+    #newIngForm {
+        width: 80%;
+        margin-bottom: 30px;
+    }
+    .ingredientCard {
+        width: 50%;
+    }
 }

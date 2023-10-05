@@ -13,21 +13,22 @@ export function IngredientCard({ ingredient, current, setCurrent, edit, setEdit 
     const { setIngredients } = useContext(IngredientsContext)
 
     return (
-        <div className="ingredientCard" style={{
-            backgroundColor: (current.id !== ingredient.id || !edit) ? 'gold' : '#AD692A',
-            color: (current.id !== ingredient.id || !edit) ? 'black' : '#FCE78A',
-            boxShadow: '1px 1px 3px #AD692A',
-            width: '20%',
-            height: 150,
-            overflow: 'scroll',
-            padding: 10,
-            textAlign: 'center',
-            borderRadius: 5,
-            wordWrap: 'break-word',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between'
-        }}>
+        <div
+            className="ingredientCard"
+            style={{
+                backgroundColor: (current.id !== ingredient.id || !edit) ? 'gold' : '#AD692A',
+                color: (current.id !== ingredient.id || !edit) ? 'black' : '#FCE78A',
+                boxShadow: '1px 1px 3px #AD692A',
+                overflow: 'scroll',
+                padding: 10,
+                textAlign: 'center',
+                borderRadius: 5,
+                wordWrap: 'break-word',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between'
+            }}
+        >
             <div>
                 <h3>{ingredient.name}</h3>
                 <p style={{ fontSize: 10 }}>{ingredient.type.name}</p>
