@@ -23,7 +23,7 @@ export function AlarmsPage() {
         const now = Date.now()
         const newAlarm = { ...alarm, last_start_timestamp: now }
         const recipe = recipes.find(recipe => recipe.id === alarm.recipe_id)
-        if (type === MACERATE_ALARM) {
+        if (type === MACERATE_ALARM.type) {
             setRecipes([
                 ...recipes.filter(item => item.id !== recipe.id),
                 {
@@ -32,7 +32,7 @@ export function AlarmsPage() {
                 }
             ].sort((a, b) => b.id - a.id))
         }
-        if (type === BOIL_ALARM) {
+        if (type === BOIL_ALARM.type) {
             setRecipes([
                 ...recipes.filter(item => item.id !== recipe.id),
                 {
@@ -105,20 +105,22 @@ export function AlarmsPage() {
                         <ul>
                             {recipe.macerate_alarms.length === 0 ?
                                 <li>-</li> :
-                                recipe.macerate_alarms.map(alarm => (
-                                    <li key={alarm.id}>
-                                        <div style={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            alignItems: 'center',
-                                            boxShadow: '1px 1px 3px #AD692A',
-                                            padding: 10
-                                        }}>
-                                            {alarm.name.replace('_', ' ')}
-                                            <Countdown alarm={alarm} type={MACERATE_ALARM} />
-                                        </div>
-                                    </li>
-                                ))}
+                                recipe.macerate_alarms
+                                    .sort((a, b) => MACERATE_ALARM.sorting[a.name] - MACERATE_ALARM.sorting[b.name])
+                                    .map(alarm => (
+                                        <li key={alarm.id}>
+                                            <div style={{
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                alignItems: 'center',
+                                                boxShadow: '1px 1px 3px #AD692A',
+                                                padding: 10
+                                            }}>
+                                                {alarm.name.replaceAll('_', ' ')}
+                                                <Countdown alarm={alarm} type={MACERATE_ALARM.type} />
+                                            </div>
+                                        </li>
+                                    ))}
                         </ul>
                     </div>
                     <div style={{ textAlign: 'center' }}>
@@ -126,20 +128,22 @@ export function AlarmsPage() {
                         <ul>
                             {recipe.boil_alarms.length === 0 ?
                                 <li>-</li> :
-                                recipe.boil_alarms.map(alarm => (
-                                    <li key={alarm.id}>
-                                        <div style={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            alignItems: 'center',
-                                            boxShadow: '1px 1px 3px #AD692A',
-                                            padding: 10
-                                        }}>
-                                            {alarm.name.replace('_', ' ')}
-                                            <Countdown alarm={alarm} type={BOIL_ALARM} />
-                                        </div>
-                                    </li>
-                                ))}
+                                recipe.boil_alarms
+                                    .sort((a, b) => BOIL_ALARM.sorting[a.name] - BOIL_ALARM.sorting[b.name])
+                                    .map(alarm => (
+                                        <li key={alarm.id}>
+                                            <div style={{
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                alignItems: 'center',
+                                                boxShadow: '1px 1px 3px #AD692A',
+                                                padding: 10
+                                            }}>
+                                                {alarm.name.replaceAll('_', ' ')}
+                                                <Countdown alarm={alarm} type={BOIL_ALARM.type} />
+                                            </div>
+                                        </li>
+                                    ))}
                         </ul>
                     </div>
                 </li>

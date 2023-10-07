@@ -22,12 +22,11 @@ export function FormStep3({
     const { createAlarm, deleteAlarm } = useAlarms()
 
     const getAlarmType = row => {
-        if (row.name === 'PRIMER_RECIRCULADO' ||
-            row.name === 'SEGUNDO_RECIRCULADO' ||
-            row.name === 'EXTRA') {
-            return MACERATE_ALARM
-        } else {
-            return BOIL_ALARM
+        if (MACERATE_ALARM.names.includes(row.name)) {
+            return MACERATE_ALARM.type
+        }
+        if (BOIL_ALARM.names.includes(row.name)) {
+            return BOIL_ALARM.type
         }
     }
 
@@ -71,8 +70,8 @@ export function FormStep3({
                     setRecipes([
                         {
                             ...recipe,
-                            macerate_alarms: [...recipe.macerate_alarms.filter(item => getAlarmType(newAlarm) === BOIL_ALARM || item.id !== data.id), data],
-                            boil_alarms: [...recipe.boil_alarms.filter(item => getAlarmType(newAlarm) === MACERATE_ALARM || item.id !== data.id), data]
+                            macerate_alarms: [...recipe.macerate_alarms.filter(item => getAlarmType(newAlarm) === BOIL_ALARM.type || item.id !== data.id), data],
+                            boil_alarms: [...recipe.boil_alarms.filter(item => getAlarmType(newAlarm) === MACERATE_ALARM.type || item.id !== data.id), data]
                         },
                         ...recipes.filter(item => item.id !== recipe.id)
                     ])
@@ -87,7 +86,7 @@ export function FormStep3({
                     errorToast(data.message)
                 }
                 if (status === 500) {
-                    errorToast(`Ya existe una alarma de ${newAlarm.name.replace('_', ' ')}`)
+                    errorToast(`Ya existe una alarma de ${newAlarm.name.replaceAll('_', ' ')}`)
                 }
             } else {
                 setAlarms([...alarms, newAlarm])
@@ -115,15 +114,15 @@ export function FormStep3({
                             setRecipes([
                                 {
                                     ...recipe,
-                                    macerate_alarms: [...recipe.macerate_alarms.filter(item => getAlarmType(row) === BOIL_ALARM || item.id !== row.id)],
-                                    boil_alarms: [...recipe.boil_alarms.filter(item => getAlarmType(row) === MACERATE_ALARM || item.id !== row.id)]
+                                    macerate_alarms: [...recipe.macerate_alarms.filter(item => getAlarmType(row) === BOIL_ALARM.type || item.id !== row.id)],
+                                    boil_alarms: [...recipe.boil_alarms.filter(item => getAlarmType(row) === MACERATE_ALARM.type || item.id !== row.id)]
                                 },
                                 ...recipes.filter(item => item.id !== recipe.id)
                             ])
                             setRecipe({
                                 ...recipe,
-                                macerate_alarms: [...recipe.macerate_alarms.filter(item => getAlarmType(row) === BOIL_ALARM || item.id !== row.id)],
-                                boil_alarms: [...recipe.boil_alarms.filter(item => getAlarmType(row) === MACERATE_ALARM || item.id !== row.id)]
+                                macerate_alarms: [...recipe.macerate_alarms.filter(item => getAlarmType(row) === BOIL_ALARM.type || item.id !== row.id)],
+                                boil_alarms: [...recipe.boil_alarms.filter(item => getAlarmType(row) === MACERATE_ALARM.type || item.id !== row.id)]
                             })
                             successToast('Alarma eliminada correctamente de esta receta.')
                         } else {
@@ -146,10 +145,8 @@ export function FormStep3({
             <div style={{ width: '50%', margin: '0 auto' }}>
                 <Table
                     columns={columnsAlarms}
-                    data={alarms.filter(a => a.type === MACERATE_ALARM ||
-                        a.name === 'PRIMER_RECIRCULADO' ||
-                        a.name === 'SEGUNDO_RECIRCULADO' ||
-                        a.name === 'EXTRA')}
+                    data={alarms.sort((a, b) => MACERATE_ALARM.sorting[a.name] - MACERATE_ALARM.sorting[b.name])
+                        .filter(a => a.type === MACERATE_ALARM.type || MACERATE_ALARM.names.includes(a.name))}
                     disableInteractivity
                 />
             </div>
@@ -157,10 +154,8 @@ export function FormStep3({
             <div style={{ width: '50%', margin: '0 auto' }}>
                 <Table
                     columns={columnsAlarms}
-                    data={alarms.filter(a => a.type === BOIL_ALARM ||
-                        a.name === 'PRIMER_LUPULO' ||
-                        a.name === 'SEGUNDO_LUPULO' ||
-                        a.name === 'WHIRPOOL')}
+                    data={alarms.sort((a, b) => BOIL_ALARM.sorting[a.name] - BOIL_ALARM.sorting[b.name])
+                        .filter(a => a.type === BOIL_ALARM || BOIL_ALARM.names.includes(a.name))}
                     disableInteractivity
                 />
             </div>
@@ -169,24 +164,24 @@ export function FormStep3({
                     <label htmlFor="type">Tipo</label>
                     <select name="type" value={newAlarm.type}>
                         <option value="">Seleccione</option>
-                        <option value={MACERATE_ALARM}>Macerado</option>
-                        <option value={BOIL_ALARM}>Hervor</option>
+                        <option value={MACERATE_ALARM.type}>Macerado</option>
+                        <option value={BOIL_ALARM.type}>Hervor</option>
                     </select>
                     <label htmlFor="name">Nombre</label>
                     <select name="name" disabled={newAlarm.type.length === 0} value={newAlarm.name}>
                         <option value="">Seleccione</option>
-                        {newAlarm.type === MACERATE_ALARM &&
+                        {newAlarm.type === MACERATE_ALARM.type &&
                             <>
-                                <option value="PRIMER_RECIRCULADO">PRIMER RECIRCULADO</option>
-                                <option value="SEGUNDO_RECIRCULADO">SEGUNDO RECIRCULADO</option>
-                                <option value="EXTRA">EXTRA</option>
+                                {MACERATE_ALARM.names.map((name, idx) => {
+                                    return <option key={idx} value={name}>{name.replaceAll('_', ' ')}</option>
+                                })}
                             </>
                         }
                         {newAlarm.type === BOIL_ALARM &&
                             <>
-                                <option value="PRIMER_LUPULO">PRIMER LUPULO</option>
-                                <option value="SEGUNDO_LUPULO">SEGUNDO LUPULO</option>
-                                <option value="WHIRPOOL">WHIRPOOL</option>
+                                {BOIL_ALARM.names.map((name, idx) => {
+                                    return <option key={idx} value={name}>{name.replaceAll('_', ' ')}</option>
+                                })}
                             </>
                         }
                     </select>

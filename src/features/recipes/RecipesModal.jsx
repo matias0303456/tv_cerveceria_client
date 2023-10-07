@@ -82,14 +82,8 @@ export function RecipesModal({ open, toggleOpen, recipe, setRecipe, edit }) {
         const newRecipe = {
             ...recipe,
             ingredients: ingredientsOnRecipe,
-            macerate_alarms: alarms.filter(a => a.type === MACERATE_ALARM ||
-                a.name === 'PRIMER_RECIRCULADO' ||
-                a.name === 'SEGUNDO_RECIRCULADO' ||
-                a.name === 'EXTRA'),
-            boil_alarms: alarms.filter(a => a.type === BOIL_ALARM ||
-                a.name === 'PRIMER_LUPULO' ||
-                a.name === 'SEGUNDO_LUPULO' ||
-                a.name === 'WHIRPOOL')
+            macerate_alarms: alarms.filter(a => a.type === MACERATE_ALARM.type || MACERATE_ALARM.names.includes(a.name)),
+            boil_alarms: alarms.filter(a => a.type === BOIL_ALARM || BOIL_ALARM.names.includes(a.name))
         }
         const isValid = validateRecipe(newRecipe)
         if (isValid) {

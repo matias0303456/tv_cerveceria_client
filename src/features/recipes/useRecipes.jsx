@@ -3,7 +3,6 @@ import { useContext, useEffect } from "react";
 import { RecipesContext } from "./RecipesProvider";
 
 import { recipesUrl } from "../../config/urls";
-import { BOIL_ALARM, MACERATE_ALARM } from "../../config/constants";
 
 export function useRecipes() {
 
