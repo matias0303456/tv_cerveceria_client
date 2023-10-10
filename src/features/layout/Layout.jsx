@@ -1,11 +1,21 @@
+import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom'
+import { io } from "socket.io-client";
 
 import Logo from '../../../public/logo.png'
+import { successToast } from '../../utils/toaster';
 
 export function Layout({ children }) {
 
     const navigate = useNavigate()
     const { pathname } = useLocation()
+
+    useEffect(() => {
+        const socket = io(import.meta.env.VITE_APP_SOCKET_SERVER)
+        socket.on('message', socket => {
+            successToast(socket)
+        })
+    }, [])
 
     return (
         <>

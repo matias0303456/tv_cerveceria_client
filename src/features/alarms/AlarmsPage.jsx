@@ -46,7 +46,10 @@ export function AlarmsPage() {
 
     function Countdown({ alarm, type }) {
 
-        const [diff, setDiff] = useState((alarm.last_start_timestamp + (alarm.duration * 60 * 1000)) - Date.now())
+        const [diff, setDiff] = useState(
+            !alarm.last_start_timestamp ? -1 :
+                (parseInt(alarm.last_start_timestamp) + (alarm.duration * 60 * 1000)) - Date.now()
+        )
 
         let intervalRef = useRef();
 
