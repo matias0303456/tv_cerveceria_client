@@ -177,7 +177,7 @@ export function FormStep3({
                                 })}
                             </>
                         }
-                        {newAlarm.type === BOIL_ALARM &&
+                        {newAlarm.type === BOIL_ALARM.type &&
                             <>
                                 {BOIL_ALARM.names.map((name, idx) => {
                                     return <option key={idx} value={name}>{name.replaceAll('_', ' ')}</option>

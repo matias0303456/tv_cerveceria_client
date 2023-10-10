@@ -34,3 +34,5 @@ export const BOIL_ALARM = {
     }
 }
 
+export const MALT_TYPE = 'MALTA'
+
