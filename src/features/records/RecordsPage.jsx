@@ -90,7 +90,7 @@ export function RecordsPage() {
         const kgs = malts?.reduce((prev, curr) => prev + curr.amount, 0)
         const calcLavado = parseInt(formValues.amount) + (parseInt(formValues.amount) * 0.10)
         const lavado = `${isNaN(calcLavado) || formValues.amount.length === 0 ? 0 : calcLavado} lt`
-        const calcMacerado = (kgs * 3) + (kgs * 0.67)
+        const calcMacerado = ((kgs * 3) + (kgs * 0.67))/1000
         const macerado = `${isNaN(calcMacerado) || formValues.amount.length === 0 ? 0 : calcMacerado} lt`
         setWaterValues({ lavado, macerado })
     }, [formValues.amount])
