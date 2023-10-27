@@ -11,9 +11,9 @@ export function useIngredients() {
         getIngredients()
     }, [])
 
-    async function getIngredients() {
+    async function getIngredients(search) {
         try {
-            const res = await fetch(ingredientsUrl, {
+            const res = await fetch(ingredientsUrl + (search ? `?search=${search}` : ''), {
                 headers: { 'Content-Type': 'application/json' }
             })
             const status = res.status
@@ -68,5 +68,5 @@ export function useIngredients() {
         }
     }
 
-    return { ingredients, createIngredient, editIngredient, deleteIngredient }
+    return { getIngredients, ingredients, createIngredient, editIngredient, deleteIngredient }
 }
