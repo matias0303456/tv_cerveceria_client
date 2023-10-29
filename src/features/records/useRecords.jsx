@@ -12,9 +12,9 @@ export function useRecords() {
         getRecords()
     }, [])
 
-    async function getRecords() {
+    async function getRecords(params) {
         try {
-            const res = await fetch(recordsUrl, {
+            const res = await fetch(recordsUrl + (params && params.length > 0 ? params : ''), {
                 headers: { 'Content-Type': 'application/json' }
             })
             const status = res.status
@@ -69,5 +69,5 @@ export function useRecords() {
         }
     }
 
-    return { records, createRecord, editRecord, deleteRecord }
+    return { records, getRecords, createRecord, editRecord, deleteRecord }
 }

@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useForm } from "react-hook-form"
 import { AiFillDelete } from 'react-icons/ai'
 import { toast } from 'react-hot-toast'
@@ -11,7 +11,6 @@ import { useRecipes } from '../recipes/useRecipes'
 import { RecordsContext } from "./RecordsProvider";
 import { formatDate, formatTimestamp } from "../../utils/formatDate";
 import { DeleteConfirmation } from "../../components/DeleteConfirmation";
-import { useIngredients } from "../ingredients/useIngredients";
 
 import { successToast, errorToast } from '../../utils/toaster'
 import { MALT_TYPE } from "../../config/constants";
@@ -26,8 +25,10 @@ export function RecordsPage() {
     })
 
     const navigate = useNavigate()
+    const [searchParams, setSearchParams] = useSearchParams()
+    const { search } = useLocation()
 
-    const { records, createRecord, editRecord, deleteRecord } = useRecords()
+    const { records, createRecord, editRecord, deleteRecord, getRecords } = useRecords()
     const { recipes } = useRecipes()
 
     const [open, setOpen] = useState(false)
@@ -90,16 +91,43 @@ export function RecordsPage() {
         const kgs = malts?.reduce((prev, curr) => prev + curr.amount, 0)
         const calcLavado = parseInt(formValues.amount) + (parseInt(formValues.amount) * 0.10)
         const lavado = `${isNaN(calcLavado) || formValues.amount.length === 0 ? 0 : calcLavado} lt`
-        const calcMacerado = ((kgs * 3) + (kgs * 0.67))/1000
+        const calcMacerado = ((kgs * 3) + (kgs * 0.67)) / 1000
         const macerado = `${isNaN(calcMacerado) || formValues.amount.length === 0 ? 0 : calcMacerado} lt`
         setWaterValues({ lavado, macerado })
     }, [formValues.amount])
 
+    const handleFilter = e => {
+        searchParams.set(e.target.name, e.target.value)
+        setSearchParams(searchParams)
+    }
+
+    useEffect(() => {
+        getRecords(search)
+    }, [searchParams])
+
     return (
         <>
-            <button style={{ width: '10%', marginBottom: 10 }} onClick={toggleOpen}>
-                Cocinar
-            </button>
+            <div>
+                <button style={{ width: '10%', marginBottom: 10 }} onClick={toggleOpen}>
+                    Cocinar
+                </button>
+                <div
+                    style={{
+                        display: 'flex',
+                        gap: 10,
+                        marginBottom: 10,
+                        padding: 10,
+                        paddingTop: 7,
+                        paddingBottom: 7,
+                        borderRadius: 5
+                    }}
+                >
+                    Filtrar desde
+                    <input type="date" name="from" onChange={handleFilter} />
+                    hasta
+                    <input type="date" name="to" onChange={handleFilter} />
+                </div>
+            </div>
             <Modal open={open} toggleOpen={toggleOpen} reset={() => {
                 setEdit(false)
                 reset()
