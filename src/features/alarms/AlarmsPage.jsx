@@ -2,6 +2,7 @@ import { useContext, useState, useRef, useEffect } from 'react'
 import { AiFillPlayCircle } from 'react-icons/ai'
 import useSound from 'use-sound';
 
+import { Bombs } from './Bombs';
 import { RecipesContext } from '../recipes/RecipesProvider'
 import { useRecipes } from "../recipes/useRecipes"
 import { useAlarms } from './useAlarms'
@@ -89,6 +90,7 @@ export function AlarmsPage() {
 
     return (
         <>
+            <Bombs />
             {recipes.length === 0 ?
                 <div style={{ textAlign: 'center', marginTop: 20 }}>
                     <p>No hay recetas registradas.</p>

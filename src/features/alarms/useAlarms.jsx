@@ -1,4 +1,4 @@
-import { alarmsUrl } from "../../config/urls"
+import { alarmsUrl, bombsUrl } from "../../config/urls"
 
 export function useAlarms() {
 
@@ -46,5 +46,20 @@ export function useAlarms() {
         }
     }
 
-    return { createAlarm, deleteAlarm, initiateAlarm }
+    async function handleBomb(action, body) {
+        try {
+            const res = await fetch(bombsUrl + `/${action}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            })
+            const status = res.status
+            const data = await res.json()
+            return { status, data }
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+    return { createAlarm, deleteAlarm, initiateAlarm, handleBomb }
 }

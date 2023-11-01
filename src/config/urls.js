@@ -7,3 +7,4 @@ export const recipesUrl = `${API_URL}/recipes`
 export const recordsUrl = `${API_URL}/records`
 export const alarmsUrl = `${API_URL}/alarms`
 export const ingredientsOnRecipesUrl = `${API_URL}/ingredients-on-recipes`
+export const bombsUrl = `${API_URL}/bombs`
