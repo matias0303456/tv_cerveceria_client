@@ -4,10 +4,11 @@ export function Modal({
     open,
     toggleOpen = false,
     reset = false,
+    className = 'generalModal',
     children
 }) {
     return (
-        <dialog open={open} onCancel={e => e.preventDefault()}>
+        <dialog className={className} open={open} onCancel={e => e.preventDefault()}>
             <div style={{ position: 'relative' }}>
                 <span
                     style={{ display: 'flex', justifyContent: 'end' }}

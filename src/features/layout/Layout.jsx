@@ -1,21 +1,42 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom'
 import { io } from "socket.io-client";
 
 import Logo from '../../../public/logo.png'
 import { successToast } from '../../utils/toaster';
+import { Modal } from '../../components/Modal';
+import { Table } from '../../components/Table';
 
 export function Layout({ children }) {
 
     const navigate = useNavigate()
     const { pathname } = useLocation()
 
+    const [socketMessage, setSocketMessage] = useState([{
+        message: '',
+        type: '',
+        value: 0
+    }])
+    const [open, setOpen] = useState(false)
+
     useEffect(() => {
         const socket = io(import.meta.env.VITE_APP_SOCKET_SERVER)
         socket.on('message', socket => {
-            successToast(socket)
+            successToast(socket.message)
+            setSocketMessage(prev => [socket, ...prev.filter(item => item.type !== socket.type && item.type.length > 0)])
         })
     }, [])
+
+    useEffect(() => {
+        if (socketMessage[0].value !== 0 && !open) toggleOpen()
+    }, [socketMessage])
+
+    const toggleOpen = () => setOpen(!open)
+
+    const columns = [
+        { label: 'Nombre', accessor: data => data.type },
+        { label: 'Valor', accessor: data => data.value }
+    ]
 
     return (
         <>
@@ -41,6 +62,16 @@ export function Layout({ children }) {
                 </nav>
             </header>
             <main>
+                <Modal className="socketModal" open={open} toggleOpen={toggleOpen}>
+                    <p style={{ textAlign: 'center', marginBottom: 10 }}>
+                        Valores actuales de los sensores
+                    </p>
+                    <Table
+                        columns={columns}
+                        data={socketMessage}
+                        disableInteractivity
+                    />
+                </Modal>
                 {children}
             </main>
             <footer>
