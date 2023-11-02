@@ -6,6 +6,7 @@ import { Bombs } from './Bombs';
 import { RecipesContext } from '../recipes/RecipesProvider'
 import { useRecipes } from "../recipes/useRecipes"
 import { useAlarms } from './useAlarms'
+import { useRecords } from '../records/useRecords'
 
 import { BOIL_ALARM, MACERATE_ALARM } from '../../config/constants'
 import alarmSound from '../../assets/alarm-sound.ogg';
@@ -18,7 +19,14 @@ export function AlarmsPage() {
     const [play] = useSound(alarmSound)
 
     const { recipes } = useRecipes()
+    const { records } = useRecords()
     const { initiateAlarm } = useAlarms()
+
+    const sortFunction = (a) => {
+        const last = records[0].recipe.id
+        if (a.id === last) return -1
+        return 0
+    }
 
     const handleInitialize = (alarm, type) => {
         const now = Date.now()
@@ -31,7 +39,7 @@ export function AlarmsPage() {
                     ...recipe,
                     macerate_alarms: [...recipe.macerate_alarms.filter(item => item.id !== newAlarm.id), newAlarm]
                 }
-            ].sort((a, b) => b.id - a.id))
+            ].sort(sortFunction))
         }
         if (type === BOIL_ALARM.type) {
             setRecipes([
@@ -40,7 +48,7 @@ export function AlarmsPage() {
                     ...recipe,
                     boil_alarms: [...recipe.boil_alarms.filter(item => item.id !== newAlarm.id), newAlarm]
                 }
-            ].sort((a, b) => b.id - a.id))
+            ].sort(sortFunction))
         }
         initiateAlarm(type, newAlarm)
     }
@@ -88,6 +96,8 @@ export function AlarmsPage() {
         )
     }
 
+    if (records.length === 0) return <></>
+
     return (
         <>
             <Bombs />
@@ -96,7 +106,7 @@ export function AlarmsPage() {
                     <p>No hay recetas registradas.</p>
                 </div> :
                 <ul>
-                    {recipes.map(recipe => (
+                    {recipes.sort(sortFunction).map(recipe => (
                         <li key={recipe.id} style={{
                             backgroundColor: 'gold',
                             color: 'black',
