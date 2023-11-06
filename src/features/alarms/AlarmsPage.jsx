@@ -23,7 +23,7 @@ export function AlarmsPage() {
     const { initiateAlarm } = useAlarms()
 
     const sortFunction = (a) => {
-        const last = records[0].recipe.id
+        const last = records[0]?.recipe.id
         if (a.id === last) return -1
         return 0
     }
@@ -95,8 +95,6 @@ export function AlarmsPage() {
             </div>
         )
     }
-
-    if (records.length === 0) return <></>
 
     return (
         <>

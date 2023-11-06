@@ -22,7 +22,7 @@ export function Layout({ children }) {
     useEffect(() => {
         const socket = io(import.meta.env.VITE_APP_SOCKET_SERVER)
         socket.on('message', socket => {
-            successToast(socket.message)
+            if (socket.message.length > 0) successToast(socket.message)
             setSocketMessage(prev => [socket, ...prev.filter(item => item.type !== socket.type && item.type.length > 0)])
         })
     }, [])
@@ -35,7 +35,7 @@ export function Layout({ children }) {
 
     const columns = [
         { label: 'Nombre', accessor: data => data.type },
-        { label: 'Valor', accessor: data => data.value }
+        { label: 'Valor', accessor: data => data.value.toString() }
     ]
 
     return (
