@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_APP_API_URL
+const API_URL = "http://vxsct2618.avnam.net:9000/api"
 
 export const unitsUrl = `${API_URL}/units`
 export const typesUrl = `${API_URL}/types`

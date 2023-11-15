@@ -20,7 +20,7 @@ export function Layout({ children }) {
     const [open, setOpen] = useState(false)
 
     useEffect(() => {
-        const socket = io(import.meta.env.VITE_APP_SOCKET_SERVER)
+        const socket = io('http://vxsct2618.avnam.net:9000/api')
         socket.on('message', socket => {
             if (socket.message.length > 0) successToast(socket.message)
             setSocketMessage(prev => [socket, ...prev.filter(item => item.type !== socket.type && item.type.length > 0)])
