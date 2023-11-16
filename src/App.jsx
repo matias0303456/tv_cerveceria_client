@@ -25,10 +25,10 @@ function App() {
                 <Toaster />
                 <Layout>
                   <Routes>
-                    <Route path="/cerveceria" element={<RecordsPage />} />
-                    <Route path="/cerveceria/recipes" element={<RecipesPage />} />
-                    <Route path="/cerveceria/alarms" element={<AlarmsPage />} />
-                    <Route path="/cerveceria/ingredients" element={<IngredientsPage />} />
+                    <Route path="/tv_cerveceria_client" element={<RecordsPage />} />
+                    <Route path="/tv_cerveceria_client/recipes" element={<RecipesPage />} />
+                    <Route path="/tv_cerveceria_client/alarms" element={<AlarmsPage />} />
+                    <Route path="/tv_cerveceria_client/ingredients" element={<IngredientsPage />} />
                     <Route path="*" element={<ErrorPage />} />
                   </Routes>
                 </Layout>
