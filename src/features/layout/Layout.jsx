@@ -18,6 +18,7 @@ export function Layout({ children }) {
         value: 0
     }])
     const [open, setOpen] = useState(false)
+    const [showContent, setShowContent] = useState(true)
 
     useEffect(() => {
         const socket = io(import.meta.env.VITE_APP_SOCKET_SERVER)
@@ -62,15 +63,24 @@ export function Layout({ children }) {
                 </nav>
             </header>
             <main>
-                <Modal className="socketModal" open={open} toggleOpen={toggleOpen}>
+                <Modal
+                    className={showContent ? 'socketModal' : 'socketModal minifiedSocketModal'}
+                    open={open}
+                    toggleOpen={toggleOpen}
+                    minimizeBtn
+                    showContent={showContent}
+                    onClick={() => setShowContent(!showContent)}
+                >
                     <p style={{ textAlign: 'center', marginBottom: 10 }}>
                         Valores actuales de los sensores
                     </p>
-                    <Table
-                        columns={columns}
-                        data={socketMessage}
-                        disableInteractivity
-                    />
+                    {showContent &&
+                        <Table
+                            columns={columns}
+                            data={socketMessage}
+                            disableInteractivity
+                        />
+                    }
                 </Modal>
                 {children}
             </main>

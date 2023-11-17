@@ -185,7 +185,8 @@ tbody .withHover:hover {
 }
 
 .generalModal,
-.socketModal {
+.socketModal,
+.minifiedSocketModal {
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.2s;
@@ -205,16 +206,26 @@ tbody .withHover:hover {
 }
 
 .generalModal[open],
-.socketModal[open] {
+.socketModal[open],
+.minifiedSocketModal[open] {
     opacity: 1;
     pointer-events: inherit;
 }
 
-.socketModal {
+.socketModal,
+.minifiedSocketModal {
     width: 30vw;
     height: 45vh;
     top: 45vh;
     left: -830px;
+}
+
+.minifiedSocketModal {
+    width: 25vw;
+    height: 12vh;
+    top: 81vh;
+    left: -900px;
+    padding: 15px;
 }
 
 #newIngForm {

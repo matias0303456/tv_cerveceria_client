@@ -44,14 +44,16 @@ export function IngredientsPage() {
                     gap: 10
                 }}
             >
-                <search>
-                    <input
-                        type="text"
-                        name="search"
-                        placeholder="Buscar..."
-                        onChange={handleSearch}
-                    />
-                </search>
+                {ingredients.length > 0 &&
+                    <search>
+                        <input
+                            type="text"
+                            name="search"
+                            placeholder="Buscar..."
+                            onChange={handleSearch}
+                        />
+                    </search>
+                }
                 <div style={{
                     display: 'flex',
                     justifyContent: 'space-around',
