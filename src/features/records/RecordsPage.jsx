@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useForm } from "react-hook-form"
 import { AiFillDelete } from 'react-icons/ai'
 import { toast } from 'react-hot-toast'
@@ -72,7 +72,7 @@ export function RecordsPage() {
             toggleOpen()
             reset()
             setEdit(false)
-            navigate('alarms')
+            navigate('/asgardiana/alarms')
         } else {
             errorToast(data.message)
         }
